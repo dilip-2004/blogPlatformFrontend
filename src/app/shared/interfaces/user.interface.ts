@@ -38,7 +38,6 @@ export interface CreateUserRequest {
   username: string;
   email: string;
   password: string;
-  full_name?: string;
   confirm_password?: string;
 }
 

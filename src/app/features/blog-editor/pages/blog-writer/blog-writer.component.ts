@@ -529,7 +529,7 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
     const blogData = {
       title: this.blogTitle,
       content: contentJsonString,
-      tag_ids: this.selectedTags,
+      tags: this.selectedTags,
       main_image_url: this.mainImageUrl || '',
       published: true
     };

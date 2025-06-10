@@ -164,7 +164,7 @@
                     *ngIf="!getImageUrl(post.author.profile_picture)"
                     class="author-avatar-placeholder"
                   >
-                    {{ post.author.username.charAt(0).toUpperCase()  }}
+                    {{ getFirstName(post.username).charAt(0).toUpperCase()  }}
                   </div>
                   <span class="author-name">{{ getFirstName(post.username) }}</span>
                 </div>

@@ -245,11 +245,8 @@
 
   <!-- Bottom Actions (Mobile) -->
   <div class="bottom-actions mobile-only">
-    <button class="mobile-btn secondary" (click)="saveBlog()" [disabled]="isSaving || !blogTitle || blogBlocks.length === 0">
-      Save Draft
-    </button>
     <button class="mobile-btn primary" (click)="openPublishModal()" [disabled]="!blogTitle || blogBlocks.length === 0">
-      Save
+      Publish
     </button>
   </div>
 </div>
