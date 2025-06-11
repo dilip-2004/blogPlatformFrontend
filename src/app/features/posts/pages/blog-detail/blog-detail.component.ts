@@ -110,16 +110,26 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     this.router.navigate(['/home']);
   }
 
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
+formatDate(dateString: string): string {
+  const date = new Date(dateString);
+
+  const year = date.getUTCFullYear();
+  const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+  const day = date.getUTCDate().toString().padStart(2, '0');
+
+  let hours = date.getUTCHours() - 1;
+  const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+
+  const ampm = hours >= 12 ? 'AM' : 'PM';
+  hours = hours % 12 || 12; // Convert 0 to 12
+
+  const formattedHours = hours.toString().padStart(2, '0');
+
+  return `${year}-${month}-${day} ${formattedHours}:${minutes} ${ampm} `;
+}
+
+
+
 
   getPlaceholderImage(): string {
     return 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';

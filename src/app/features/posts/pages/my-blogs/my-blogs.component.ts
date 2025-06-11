@@ -116,15 +116,22 @@ export class MyBlogsComponent implements OnInit, OnDestroy {
   }
 
   formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
+  const date = new Date(dateString);
+
+  const year = date.getUTCFullYear();
+  const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+  const day = date.getUTCDate().toString().padStart(2, '0');
+
+  let hours = date.getUTCHours() - 1;
+  const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+
+  const ampm = hours >= 12 ? 'AM' : 'PM';
+  hours = hours % 12 || 12; // Convert 0 to 12
+
+  const formattedHours = hours.toString().padStart(2, '0');
+
+  return `${year}-${month}-${day} ${formattedHours}:${minutes} ${ampm} `;
+}
 
   getContentPreview(blog: Blog): string {
     // Handle both API response format (blog_body) and localStorage format (content)
