@@ -294,6 +294,7 @@ export class BlogStateService {
       _id: localBlog._id,
       user_id: localBlog.user_id || 'current_user',
       title: localBlog.title,
+      username:localBlog.username,
       content: localBlog.content,
       tags: localBlog.tags || [],  // Changed from tag_ids to tags
       main_image_url: localBlog.main_image_url,
@@ -322,6 +323,7 @@ export class BlogStateService {
       _id: summary.id || summary._id,
       user_id: summary.user_id,
       title: summary.title,
+      username:summary.username,
       content: summary.content || summary.blog_body || '',
       tags: summary.tags || [],  // Changed from tag_ids to tags
       main_image_url: summary.main_image_url,
@@ -336,6 +338,7 @@ export class BlogStateService {
       _id: apiResponse.id || apiResponse._id,
       user_id: apiResponse.user_id,
       title: apiResponse.title,
+      username:apiResponse.username,
       content: apiResponse.blog_body || apiResponse.content || '',
       tags: apiResponse.tags || [],  // Changed from tag_ids to tags
       main_image_url: apiResponse.main_image_url,

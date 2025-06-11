@@ -5,6 +5,7 @@ import { Comment } from './comment.interface';
 export interface Blog {
   _id: string;
   user_id: string;
+  username:string;
   title: string;
   content: string;
   tags: string[];  // Changed from tag_ids to tags to match backend
