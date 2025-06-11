@@ -8,6 +8,7 @@ import { BlogService } from '../../../../core/services/blog.service';
 import { ImageUploadService } from '../../../../core/services/image-upload.service';
 import { FooterComponent } from "../../../../shared/components/footer/footer.component";
 import { Tag } from '../../../../shared/interfaces/post.interface';
+import { DateUtil } from '../../../../shared/utils/date.util';
 
 export interface BlogBlock {
   id: string;
@@ -224,8 +225,8 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
       tag_ids: [],
       main_image_url: '',
       published: false, // Save as draft
-      created_at: this.getCurrentTimestamp(),
-      updated_at: this.getCurrentTimestamp()
+      created_at: DateUtil.getCurrentTimestamp(),
+      updated_at: DateUtil.getCurrentTimestamp()
     };
 
     console.log('Saving blog draft to localStorage:', blogData);
@@ -331,10 +332,6 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
     return timestamp + random.padEnd(16, '0');
   }
 
-  // Get current timestamp for created_at and updated_at
-  private getCurrentTimestamp(): string {
-    return new Date().toISOString();
-  }
 
   // Get current user ID (you might need to implement this based on your auth service)
   private getCurrentUserId(): string {

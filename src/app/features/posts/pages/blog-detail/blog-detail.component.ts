@@ -1,41 +1,54 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { BlogService } from '../../../../core/services/blog.service';
-import { BlogSummary, AiSummary } from '../../../../shared/interfaces/post.interface';
-import { CommentResponse, CommentCreate } from '../../../../shared/interfaces/comment.interface';
-import { LikeResponse } from '../../../../shared/interfaces/like.interface';
-import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { AuthService } from '../../../../core/services/auth.service';
+import { Blog, BlogSummary, AiSummary } from '../../../../shared/interfaces/post.interface';
+import { FooterComponent } from '../../../../shared/components/footer/footer.component';
+import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
 import { AiSummaryService } from '../../../../core/services/ai-summary.service';
 import { CommentService } from '../../../../core/services/comment.service';
 import { LikeService } from '../../../../core/services/like.service';
+import { CommentResponse } from '../../../../shared/interfaces/comment.interface';
+
+// Local interfaces for component use
+interface CommentCreate {
+  text: string;
+}
+
+interface LikeResponse {
+  _id?: string;
+  user_id?: string;
+  blog_id?: string;
+  created_at?: string;
+  message?: string;
+}
 
 @Component({
   selector: 'app-blog-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, FooterComponent],
+  imports: [CommonModule, FormsModule, FooterComponent, DateFormatPipe],
   templateUrl: './blog-detail.component.html',
   styleUrl: './blog-detail.component.css'
 })
 export class BlogDetailComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   
-  blog: BlogSummary | null = null;
+  blog: Blog | null = null;
   loading = false;
   error: string | null = null;
   blogId: string = '';
 
   // AI Summary properties
-  aiSummary: AiSummary | null = null;
+  aiSummary: any | null = null;
   summaryLoading = false;
   summaryError: string | null = null;
   showSummarySidebar = false;
 
   // Comment properties
-  comments: CommentResponse[] = [];
+  comments: any[] = [];
   commentsLoading = false;
   commentsError: string | null = null;
   newCommentText = '';
@@ -82,7 +95,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: (blog) => {
-        this.blog = blog;
+        this.blog = blog as Blog;
         this.loading = false;
         // Initialize counts from blog data
         this.likesCount = blog.likes_count || 0;
@@ -110,23 +123,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     this.router.navigate(['/home']);
   }
 
-formatDate(dateString: string): string {
-  const date = new Date(dateString);
-
-  const year = date.getUTCFullYear();
-  const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-  const day = date.getUTCDate().toString().padStart(2, '0');
-
-  let hours = date.getUTCHours() - 1;
-  const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-
-  const ampm = hours >= 12 ? 'AM' : 'PM';
-  hours = hours % 12 || 12; // Convert 0 to 12
-
-  const formattedHours = hours.toString().padStart(2, '0');
-
-  return `${year}-${month}-${day} ${formattedHours}:${minutes} ${ampm} `;
-}
 
 
 
@@ -200,7 +196,7 @@ formatDate(dateString: string): string {
     this.aiSummaryService.getAiSummary(this.blogId).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
-      next: (summary: AiSummary) => {
+      next: (summary: any) => {
         this.aiSummary = summary;
         this.summaryLoading = false;
       },
@@ -230,7 +226,7 @@ formatDate(dateString: string): string {
     ).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
-      next: (summary: AiSummary) => {
+      next: (summary: any) => {
         this.aiSummary = summary;
         this.summaryLoading = false;
       },
@@ -303,7 +299,7 @@ formatDate(dateString: string): string {
     this.commentService.getBlogComments(this.blogId).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
-      next: (comments: CommentResponse[]) => {
+      next: (comments: any[]) => {
         this.comments = comments;
         // Update comment count based on actual loaded comments
         this.commentCount = comments.length;
@@ -332,7 +328,7 @@ formatDate(dateString: string): string {
     this.commentService.createComment(this.blogId, commentData).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
-      next: (comment: CommentResponse) => {
+      next: (comment: any) => {
         this.comments.unshift(comment);
         this.newCommentText = '';
         this.addingComment = false;
@@ -350,7 +346,7 @@ formatDate(dateString: string): string {
     });
   }
 
-  startEditComment(comment: CommentResponse): void {
+  startEditComment(comment: any): void {
     this.editingCommentId = comment._id;
     this.editingCommentText = comment.text;
   }
@@ -370,7 +366,7 @@ formatDate(dateString: string): string {
     this.commentService.updateComment(this.editingCommentId, commentData).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
-      next: (updatedComment: CommentResponse) => {
+      next: (updatedComment: any) => {
         const index = this.comments.findIndex(c => c._id === this.editingCommentId);
         if (index !== -1) {
           this.comments[index] = updatedComment;
@@ -403,7 +399,7 @@ formatDate(dateString: string): string {
     });
   }
 
-  canEditComment(comment: CommentResponse): boolean {
+  canEditComment(comment: any): boolean {
     return this.authService.isAuthenticated() && 
            comment.user_id === this.authService.getCurrentUser()?._id;
   }

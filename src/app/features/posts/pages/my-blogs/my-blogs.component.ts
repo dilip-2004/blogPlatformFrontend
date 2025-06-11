@@ -5,11 +5,12 @@ import { Subject, takeUntil } from 'rxjs';
 import { BlogStateService } from '../../../../core/services/blog-state.service';
 import { Blog } from '../../../../shared/interfaces/post.interface';
 import { FooterComponent } from "../../../../shared/components/footer/footer.component";
+import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
 
 @Component({
   selector: 'app-my-blogs',
   standalone: true,
-  imports: [CommonModule, FooterComponent],
+  imports: [CommonModule, FooterComponent, DateFormatPipe],
   templateUrl: './my-blogs.component.html',
   styleUrl: './my-blogs.component.css'
 })
@@ -115,23 +116,6 @@ export class MyBlogsComponent implements OnInit, OnDestroy {
     return published ? 'Published' : 'Draft';
   }
 
-  formatDate(dateString: string): string {
-  const date = new Date(dateString);
-
-  const year = date.getUTCFullYear();
-  const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-  const day = date.getUTCDate().toString().padStart(2, '0');
-
-  let hours = date.getUTCHours() - 1;
-  const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-
-  const ampm = hours >= 12 ? 'AM' : 'PM';
-  hours = hours % 12 || 12; // Convert 0 to 12
-
-  const formattedHours = hours.toString().padStart(2, '0');
-
-  return `${year}-${month}-${day} ${formattedHours}:${minutes} ${ampm} `;
-}
 
   getContentPreview(blog: Blog): string {
     // Handle both API response format (blog_body) and localStorage format (content)

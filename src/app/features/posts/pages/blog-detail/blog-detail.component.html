@@ -69,15 +69,15 @@
             <h1 class="blog-title">{{ blog.title }}</h1>
             
             <!-- Author Info -->
-            <div class="blog-author" *ngIf="blog.user">
+            <div class="blog-author" *ngIf="blog.user_id">
               <img 
-                [src]="blog.user.profile_picture || getDefaultAvatar(blog.user.username)" 
-                [alt]="blog.user.username"
+                [src]="blog.user?.profile_picture || getDefaultAvatar(blog.user?.username || 'User')" 
+                [alt]="blog.user?.username || 'User'"
                 class="author-avatar"
               />
               <div class="author-details">
-                <span class="author-name">{{ blog.user.username }}</span>
-                <span class="author-username">{{ '@' + blog.user.username }}</span>
+                <span class="author-name">{{ blog.user?.username || 'Unknown User' }}</span>
+                <span class="author-username">{{ '@' + (blog.user?.username || 'user') }}</span>
               </div>
             </div>
             
@@ -88,13 +88,13 @@
                   <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                     <path d="M6 2v2M14 2v2M3 8h14M5 4h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
-                  Published: {{ formatDate(blog.created_at) }}
+                  Published: {{ blog.created_at | dateFormat }}
                 </span>
                 <span class="blog-date" *ngIf="blog.updated_at && blog.updated_at !== blog.created_at">
                   <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                     <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m-15.357-2A8.001 8.001 0 0015.419 15M15 15H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
-                  Updated: {{ formatDate(blog.updated_at) }}
+                  Updated: {{ blog.updated_at | dateFormat }}
                 </span>
               </div>
               
@@ -215,8 +215,8 @@
                 <div class="comment" *ngFor="let comment of comments">
                   <div class="comment-content">
                     <div class="comment-header">
-                      <span class="comment-author">{{ comment.user_name }}</span>
-                      <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
+                      <span class="comment-author">{{ comment.user_name || comment.username }}</span>
+                      <span class="comment-date">{{ comment.created_at | dateFormat }}</span>
                       <div class="comment-actions" *ngIf="canEditComment(comment)">
                         <button class="edit-btn" (click)="startEditComment(comment)" *ngIf="editingCommentId !== comment._id">Edit</button>
                         <button class="delete-btn" (click)="deleteComment(comment._id)" *ngIf="editingCommentId !== comment._id">Delete</button>
@@ -266,7 +266,7 @@
                 <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                   <path d="M6 2v2M14 2v2M3 8h14M5 4h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                Generated: {{ formatDate(aiSummary.created_at) }}
+                Generated: {{ aiSummary.created_at | dateFormat }}
               </span>
               <div class="summary-actions">
                 <button 

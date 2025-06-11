@@ -8,6 +8,7 @@ import { BlogService } from '../../../../core/services/blog.service';
 import { ImageUploadService } from '../../../../core/services/image-upload.service';
 import { Blog, UpdateBlogRequest, Tag } from '../../../../shared/interfaces/post.interface';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
+import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
 
 export interface BlogBlock {
   id: string;
@@ -19,7 +20,7 @@ export interface BlogBlock {
 @Component({
   selector: 'app-edit-blog',
   standalone: true,
-  imports: [CommonModule, FormsModule, FooterComponent],
+  imports: [CommonModule, FormsModule, FooterComponent, DateFormatPipe],
   templateUrl: './edit-blog.component.html',
   styleUrl: './edit-blog.component.css'
 })
@@ -417,23 +418,6 @@ export class EditBlogComponent implements OnInit, OnDestroy {
     return block.id;
   }
 
-  formatDate(dateString: string): string {
-  const date = new Date(dateString);
-
-  const year = date.getUTCFullYear();
-  const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-  const day = date.getUTCDate().toString().padStart(2, '0');
-
-  let hours = date.getUTCHours() - 1;
-  const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-
-  const ampm = hours >= 12 ? 'AM' : 'PM';
-  hours = hours % 12 || 12; // Convert 0 to 12
-
-  const formattedHours = hours.toString().padStart(2, '0');
-
-  return `${year}-${month}-${day} ${formattedHours}:${minutes} ${ampm} `;
-}
 
   // S3 Image Upload Functionality
   

@@ -9,11 +9,12 @@ import { PostSummary } from '../../../../shared/interfaces/post.interface';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { InterestsComponent } from '../../../../shared/components/interests/interests.component';
 import { InterestsService } from '../../../../core/services/interests.service';
+import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule,FooterComponent,InterestsComponent],
+  imports: [CommonModule, RouterLink, FormsModule,FooterComponent,InterestsComponent, DateFormatPipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -208,23 +209,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  formatDate(dateString: string): string {
-  const date = new Date(dateString);
-
-  const year = date.getUTCFullYear();
-  const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-  const day = date.getUTCDate().toString().padStart(2, '0');
-
-  let hours = date.getUTCHours() - 1;
-  const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-
-  const ampm = hours >= 12 ? 'AM' : 'PM';
-  hours = hours % 12 || 12; // Convert 0 to 12
-
-  const formattedHours = hours.toString().padStart(2, '0');
-
-  return `${year}-${month}-${day} ${formattedHours}:${minutes} ${ampm} `;
-}
 
 
   getPlaceholderImage(): string {
