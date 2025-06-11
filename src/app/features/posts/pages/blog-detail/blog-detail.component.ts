@@ -87,6 +87,41 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  getImageUrl(imageUrl: string | undefined): string | null {
+    // Return null if the image URL is not available
+    if (!imageUrl || imageUrl.trim() === '') {
+      return null;
+    }
+    
+    // If it's already a full URL (starts with http/https), return as is
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+    
+    // If it's an AWS S3 key/path, ensure it's a complete URL
+    if (imageUrl.startsWith('uploads/')) {
+      // Construct the full S3 URL if only the path is provided
+      return `https://blog-app-2025.s3.amazonaws.com/${imageUrl}`;
+    }
+    
+    // If it contains amazonaws.com, it's already a complete S3 URL
+    if (imageUrl.includes('amazonaws.com')) {
+      return imageUrl;
+    }
+    
+    // If it's a data URL (base64), return as is
+    if (imageUrl.startsWith('data:')) {
+      return imageUrl;
+    }
+    
+    // Default fallback for other cases
+    return null;
+  }
+
+  getFirstName(fullName?: string): string {
+    return fullName?.split('@')[0] || '';
+  }
+
   loadBlog(): void {
     this.loading = true;
     this.error = null;

@@ -70,14 +70,13 @@
             
             <!-- Author Info -->
             <div class="blog-author" *ngIf="blog.user_id">
-              <img 
-                [src]="blog.user?.profile_picture || getDefaultAvatar(blog.username || 'User')" 
-                [alt]="blog.username || 'User'"
-                class="author-avatar"
-              />
+              <div 
+                class="author-avatar-placeholder"
+              >
+                {{ blog.username.charAt(0).toUpperCase()  }}
+              </div>
               <div class="author-details">
                 <span class="author-name">{{ blog.username || 'Unknown Userrr' }}</span>
-                <span class="author-username">{{ '@' + (blog.username || 'user') }}</span>
               </div>
             </div>
             
