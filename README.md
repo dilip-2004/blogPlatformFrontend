@@ -821,13 +821,6 @@ Closes #456"
 
 ---
 
-## 📞 Support
-
-For frontend-specific issues:
-- 📧 **Email**: frontend-support@blogplatform.com
-- 💬 **Discord**: [#frontend-support](https://discord.gg/blogplatform-frontend)
-- 📝 **Issues**: [GitHub Issues](https://github.com/yourusername/BlogPlatform/issues)
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.
