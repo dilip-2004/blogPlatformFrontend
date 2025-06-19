@@ -630,7 +630,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1010;
   padding: 1rem;
 }
 
@@ -922,7 +922,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1011;
   padding: 1.5rem;
 }
 
