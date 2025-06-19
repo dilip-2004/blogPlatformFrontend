@@ -9,6 +9,7 @@ import { ImageUploadService } from '../../../../core/services/image-upload.servi
 import { FooterComponent } from "../../../../shared/components/footer/footer.component";
 import { Tag } from '../../../../shared/interfaces/post.interface';
 import { DateUtil } from '../../../../shared/utils/date.util';
+import { normalizeTag, normalizeTags, areTagsEqual } from '../../../../shared/utils/tag-utils';
 
 export interface BlogBlock {
   id: string;
@@ -37,6 +38,7 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   isSaving = false;
   isUploadingImage = false;
+  private hoverTimeout: any = null;
   
   // Publish modal state
   showPublishModal = false;
@@ -95,14 +97,28 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
 
   // Toggle add menu
   toggleAddMenu(blockId?: string): void {
+    // Clear any pending close timeout
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = null;
+    }
+    
     this.currentBlockId = blockId || null;
-    this.showAddMenu = !this.showAddMenu;
+    this.showAddMenu = true; // Always show on hover/click
   }
 
-  // Close add menu
+  // Close add menu with delay to prevent accidental closing
   closeAddMenu(): void {
-    this.showAddMenu = false;
-    this.currentBlockId = null;
+    // Clear any existing timeout
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+    }
+    
+    // Add a small delay before closing to prevent accidental closing
+    this.hoverTimeout = setTimeout(() => {
+      this.showAddMenu = false;
+      this.currentBlockId = null;
+    }, 200); // 200ms delay
   }
 
   // Add new block
@@ -299,7 +315,7 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
         console.log('Full upload response:', response);
         if (response && response.imageUrl) {
           block.data = response.imageUrl;
-          console.log('Image uploaded to S3 successfully:', response.imageUrl);
+          console.log('Image uploaded successfully:', response.imageUrl);
           this.showMessageContainer('Image uploaded successfully!', 'success');
           this.isUploadingImage = false;
         } else {
@@ -439,7 +455,7 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (response) => {
         this.mainImageUrl = response.imageUrl;
-        console.log('Main image uploaded to S3:', response.imageUrl);
+        console.log('Main image uploaded successfully:', response.imageUrl);
         this.showMessageContainer('Main image uploaded successfully!', 'success');
         this.isUploadingMainImage = false;
       },
@@ -474,7 +490,8 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
       return;
     }
     
-    if (this.selectedTags.includes(tagName)) {
+    const norm = normalizeTag(tagName);
+    if (this.selectedTags.some(t => areTagsEqual(t, norm))) {
       alert('Tag already added');
       return;
     }
@@ -484,7 +501,7 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
       return;
     }
     
-    this.selectedTags.push(tagName);
+    this.selectedTags.push(norm);
     this.newTagInput = '';
   }
 
@@ -498,12 +515,13 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
 
   // Add tag from recommended list
   addRecommendedTag(tagName: string): void {
-    if (!this.selectedTags.includes(tagName)) {
+    const norm = normalizeTag(tagName);
+    if (!this.selectedTags.some(t => areTagsEqual(t, norm))) {
       if (this.selectedTags.length >= 10) {
         alert('Maximum 10 tags allowed');
         return;
       }
-      this.selectedTags.push(tagName);
+      this.selectedTags.push(norm);
     }
   }
 
@@ -526,7 +544,7 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
     const blogData = {
       title: this.blogTitle,
       content: contentJsonString,
-      tags: this.selectedTags,
+      tags: normalizeTags(this.selectedTags),
       main_image_url: this.mainImageUrl || '',
       published: true
     };
