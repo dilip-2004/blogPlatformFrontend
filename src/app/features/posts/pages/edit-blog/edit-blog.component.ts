@@ -9,7 +9,7 @@ import { ImageUploadService } from '../../../../core/services/image-upload.servi
 import { Blog, UpdateBlogRequest, Tag } from '../../../../shared/interfaces/post.interface';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
-import { normalizeTag, normalizeTags, areTagsEqual } from '../../../../shared/utils/tag-utils';
+import { normalizeTag, normalizeTags, areTagsEqual } from '../../../../shared/utils/tag.util';
 
 export interface BlogBlock {
   id: string;
