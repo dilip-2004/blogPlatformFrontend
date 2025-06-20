@@ -29,13 +29,25 @@ yarn-error.log
 .history/*
 
 # Miscellaneous
-/.angular/cache
+/.angular
 .sass-cache/
 /connect.lock
 /coverage
 /libpeerconnection.log
 testem.log
 /typings
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Angular specific
+*.tgz
+*.tar.gz
+/e2e/reports
+/e2e/screenshots
 
 # System files
 .DS_Store

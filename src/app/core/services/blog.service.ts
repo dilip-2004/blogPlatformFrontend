@@ -109,7 +109,52 @@ export class BlogService {
     };
 
     return this.getBlogs(blogFilters).pipe(
-      switchMap(blogResponse => this.convertBlogsResponseToPostsResponse(blogResponse))
+      switchMap(blogResponse => {
+        const blogs = blogResponse.blogs.filter(blog => blog && blog._id);
+        
+        // Get unique user IDs that need to be fetched
+        const userIds = [...new Set(blogs.map(blog => blog.user_id).filter(id => id))];
+        
+        // Fetch user data for all unique user IDs
+        const userRequests = userIds.map(userId => this.getUserInfo(userId));
+        
+        if (userRequests.length === 0) {
+          // No users to fetch, return with default author info
+          const posts: PostSummary[] = blogs.map(blog => this.mapBlogToPost(blog, null));
+          return of({
+            posts,
+            total: blogResponse.total,
+            page: blogResponse.page,
+            limit: blogResponse.limit,
+            total_pages: blogResponse.total_pages
+          });
+        }
+        
+        return forkJoin(userRequests).pipe(
+          map(users => {
+            // Create a map of user data by user ID
+            const userMap = new Map();
+            users.forEach(user => {
+              if (user && user.id) {
+                userMap.set(user.id, user);
+              }
+            });
+            
+            const posts: PostSummary[] = blogs.map(blog => {
+              const userInfo = userMap.get(blog.user_id);
+              return this.mapBlogToPost(blog, userInfo);
+            });
+            
+            return {
+              posts,
+              total: blogResponse.total,
+              page: blogResponse.page,
+              limit: blogResponse.limit,
+              total_pages: blogResponse.total_pages
+            };
+          })
+        );
+      })
     );
   }
 
@@ -121,70 +166,27 @@ searchPosts(query: string, page = 1, limit = 10): Observable<PostsResponse> {
 
   // 2. Attempt dedicated search
   return this.searchBlogs(query, page, limit).pipe(
-    // 3. Transform successful search response with user data fetching
-    switchMap(searchResponse => this.transformSearchResponse(searchResponse, limit)),
+    // 3. Transform successful search response
+    map(searchResponse => this.transformSearchResponse(searchResponse, limit)),
     
     // 4. Fallback if search fails
     catchError(error => this.handleSearchError(query, page, limit, error))
   );
 }
 
-// Helper method for transformation with user data fetching
-private transformSearchResponse(response: SearchBlogsResponse, limit: number): Observable<PostsResponse> {
+// Helper method for transformation
+private transformSearchResponse(response: SearchBlogsResponse, limit: number): PostsResponse {
   const blogs = response.blogs.map(item => 
     'blog' in item ? item.blog : item
-  ).filter(blog => blog && blog.id);
-
-  console.log('🔍 transformSearchResponse - blogs:', blogs.length);
-  // Get unique user IDs that need to be fetched
-  const userIds = [...new Set(blogs.map(blog => blog.user_id).filter(id => id))];
-  console.log('🔍 transformSearchResponse - User IDs to fetch:', userIds);
-  
-  // Fetch user data for all unique user IDs
-  const userRequests = userIds.map(userId => this.getUserInfo(userId));
-  
-  if (userRequests.length === 0) {
-    console.log('🔍 transformSearchResponse - No user requests needed');
-    return of({
-      posts: blogs.map(blog => this.mapBlogToPost(blog, null)),
-      total: response.total,
-      page: response.page,
-      limit: response.page_size, // Convert backend's page_size to frontend's limit
-      total_pages: response.total_pages
-    });
-  }
-  
-  return forkJoin(userRequests).pipe(
-    map(users => {
-      console.log('🔍 transformSearchResponse - Fetched all users:', users);
-      const userMap = new Map();
-      users.forEach(user => {
-        if (user) {
-          // Use both _id and id for mapping to handle different formats
-          const userId = user._id || user.id;
-          if (userId) {
-            userMap.set(userId, user);
-            console.log(`🔍 transformSearchResponse - Mapped user ${userId} to userMap:`, user);
-          }
-        }
-      });
-      
-      console.log('🔍 transformSearchResponse - Final userMap:', Array.from(userMap.entries()));
-      const posts: PostSummary[] = blogs.map(blog => {
-        const userInfo = userMap.get(blog.user_id);
-        console.log(`🔍 transformSearchResponse - Mapping blog ${blog.id} with user_id ${blog.user_id}, found userInfo:`, userInfo);
-        return this.mapBlogToPost(blog, userInfo);
-      });
-      
-      return {
-        posts,
-        total: response.total,
-        page: response.page,
-        limit: response.page_size,
-        total_pages: response.total_pages
-      };
-    })
   );
+
+  return {
+    posts: blogs.map(blog => this.mapBlogToPost(blog, null)),
+    total: response.total,
+    page: response.page,
+    limit: response.page_size, // Convert backend's page_size to frontend's limit
+    total_pages: response.total_pages
+  };
 }
 
 // Helper method for error handling
@@ -197,7 +199,13 @@ private handleSearchError(query: string, page: number, limit: number, error: any
     limit,
     published: true 
   }).pipe(
-    switchMap(blogsResponse => this.convertBlogsResponseToPostsResponse(blogsResponse)),
+    map(blogsResponse => ({
+      posts: blogsResponse.blogs.map(blog => this.mapBlogToPost(blog, null)),
+      total: blogsResponse.total,
+      page: blogsResponse.page,
+      limit: blogsResponse.limit,
+      total_pages: blogsResponse.total_pages
+    })),
     catchError(() => of(this.createEmptyResponse(page, limit)))
   );
 }
@@ -215,7 +223,7 @@ private createEmptyResponse(page: number, limit: number): PostsResponse {
 
   getPostsByTag(tag: string, page = 1, limit = 10): Observable<PostsResponse> {
     return this.getBlogsByTag(tag, page, limit).pipe(
-      switchMap(blogResponse => this.convertBlogsResponseToPostsResponse(blogResponse))
+      map(blogResponse => this.convertBlogsToPostsResponse(blogResponse))
     );
   }
 
@@ -255,17 +263,14 @@ private createEmptyResponse(page: number, limit: number): PostsResponse {
 
   private convertBlogsResponseToPostsResponse(blogResponse: BlogsResponse): Observable<PostsResponse> {
     const blogs = blogResponse.blogs.filter(blog => blog && blog._id);
-    console.log('🏗️ Converting blogs to posts, blogs:', blogs.length);
     
     // Get unique user IDs that need to be fetched
     const userIds = [...new Set(blogs.map(blog => blog.user_id).filter(id => id))];
-    console.log('👥 User IDs to fetch:', userIds);
     
     // Fetch user data for all unique user IDs
     const userRequests = userIds.map(userId => this.getUserInfo(userId));
     
     if (userRequests.length === 0) {
-      console.log('⚠️ No user requests needed');
       const posts: PostSummary[] = blogs.map(blog => this.mapBlogToPost(blog, null));
       return of({
         posts,
@@ -278,26 +283,15 @@ private createEmptyResponse(page: number, limit: number): PostsResponse {
     
     return forkJoin(userRequests).pipe(
       map(users => {
-        console.log('👥 Fetched all users:', users);
         const userMap = new Map();
         users.forEach(user => {
-          if (user) {
-            // Use both _id and id for mapping to handle different formats
-            const userId = user._id || user.id;
-            if (userId) {
-              userMap.set(userId, user);
-              console.log(`📍 Mapped user ${userId} to userMap:`, user);
-            }
+          if (user && user.id) {
+            userMap.set(user.id, user);
           }
         });
         
-        console.log('🗺️ Final userMap:', Array.from(userMap.entries()));
-        
         const posts: PostSummary[] = blogs.map(blog => {
           const userInfo = userMap.get(blog.user_id);
-          console.log(`🔗 Mapping blog ${blog._id} with user_id ${blog.user_id}, found userInfo:`, userInfo);
-          console.log('🗺️ Available userMap keys:', Array.from(userMap.keys()));
-          console.log('🔍 Looking for user_id:', blog.user_id, 'type:', typeof blog.user_id);
           return this.mapBlogToPost(blog, userInfo);
         });
         
@@ -313,30 +307,18 @@ private createEmptyResponse(page: number, limit: number): PostsResponse {
   }
 
   private mapBlogToPost(blog: any, userInfo: any): PostSummary {
-    // Use blog.username as the primary source, fallback to userInfo only if blog.username is not available
-    const primaryUsername = blog.username || userInfo?.username || 'Unknown';
-    
-    console.log('🗂️ mapBlogToPost - Mapping blog to post:', {
-      blogId: blog._id || blog.id,
-      blogUserId: blog.user_id,
-      blogUsername: blog.username,
-      userInfo: userInfo,
-      userInfoProfilePicture: userInfo?.profile_picture,
-      blogUserProfilePicture: blog.user?.profile_picture
-    });
-    
-    const mappedPost = {
-      id: blog._id || blog.id,
+    return {
+      id: blog._id,
       title: blog.title || 'Untitled',
       excerpt: blog.excerpt || this.generateExcerpt(blog.blog_body || blog.content),
       slug: this.generateSlug(blog.title),
-      status: blog.published ? 'published' as const : 'draft' as const,
+      status: blog.published ? 'published' : 'draft',
       featured_image: blog.main_image_url,
       author_id: blog.user_id,
-      username: primaryUsername,
+      username: userInfo?.username || blog.username || 'Unknown',
       author: {
         id: blog.user?._id || blog.user_id,
-        username: primaryUsername,
+        username: userInfo?.username || blog.user?.username || 'Unknown',
         profile_picture: userInfo?.profile_picture || blog.user?.profile_picture
       },
       tags: Array.isArray(blog.tags) ? (typeof blog.tags[0] === 'string' ? blog.tags as string[] : (blog.tags as any[]).map(tag => tag.name || tag)) : [],
@@ -347,40 +329,22 @@ private createEmptyResponse(page: number, limit: number): PostsResponse {
       created_at: blog.created_at,
       updated_at: blog.updated_at
     };
-    
-    console.log('📄 mapBlogToPost - Mapped post result:', {
-      id: mappedPost.id,
-      username: mappedPost.username,
-      authorId: mappedPost.author.id,
-      authorUsername: mappedPost.author.username,
-      authorProfilePicture: mappedPost.author.profile_picture
-    });
-    
-    return mappedPost;
   }
 
-  getUserInfo(userId: string): Observable<any> {
-    console.log('👤 getUserInfo called for userId:', userId);
-    
+  private getUserInfo(userId: string): Observable<any> {
     // Check cache first
     if (this.userCache.has(userId)) {
-      const cachedUser = this.userCache.get(userId);
-      console.log('📦 Using cached user data:', cachedUser);
-      return of(cachedUser);
+      return of(this.userCache.get(userId));
     }
     
-    console.log('🌐 Fetching user data from API for userId:', userId);
     // Fetch user info and cache it
     return this.authService.getUserById(userId).pipe(
       map(user => {
-        console.log('✅ Successfully fetched user data:', user);
-        console.log('🖼️ User profile_picture specifically:', user?.profile_picture);
-        console.log('🔑 User object keys:', Object.keys(user || {}));
         this.userCache.set(userId, user);
         return user;
       }),
       catchError(error => {
-        console.warn(`❌ Failed to fetch user info for ID ${userId}:`, error);
+        console.warn(`Failed to fetch user info for ID ${userId}:`, error);
         // Return a fallback user object
         const fallbackUser = { id: userId, username: 'Unknown', profile_picture: null };
         this.userCache.set(userId, fallbackUser);

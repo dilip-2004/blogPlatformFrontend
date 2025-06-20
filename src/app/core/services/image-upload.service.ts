@@ -3,19 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { ImageUploadResponse, BackendImageUploadResponse } from '../../shared/interfaces/api.interface';
 
-// Backend response interface (what actually comes from the API)
-interface BackendImageUploadResponse {
-  success: boolean;
-  imageUrl: string;
-  message?: string;
-}
-
-// Frontend interface (what components expect)
-interface ImageUploadResponse {
-  imageUrl: string;
-  url: string; // alias for compatibility
-}
+// Note: Interfaces moved to api.interface.ts for better organization
 
 @Injectable({
   providedIn: 'root'

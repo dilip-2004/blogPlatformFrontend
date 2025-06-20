@@ -1,5 +1,3 @@
-import { User } from './user.interface';
-
 // Comment interfaces matching backend format
 export interface Comment {
   _id: string;

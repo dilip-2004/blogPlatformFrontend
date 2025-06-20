@@ -1,0 +1,195 @@
+/* HighCharts Component Enhanced Styling */
+.dashboard-wrapper {
+  padding: 0;
+  background: transparent;
+  width: 100%;
+}
+
+/* Stats Overview Section */
+.overview-header {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 1rem;
+  color: white;
+  text-align: center;
+}
+
+.overview-header h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.overview-header p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 0.9rem;
+}
+
+/* Stats Cards in Top Section */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  padding: 0;
+  margin-bottom: 2.5rem;
+}
+
+.card {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.card h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.card p {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+/* Charts Grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  width: 100%;
+}
+
+.card-box {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  min-height: 350px;
+  padding: 1rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  z-index: 1;
+}
+
+.card-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-box-header {
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 0.5rem 0 1rem 0;
+  text-align: center;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .charts-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  .cards-container {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+  
+  .card {
+    padding: 1rem;
+  }
+  
+  .card p {
+    font-size: 1.5rem;
+  }
+  
+  .charts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .overview-header {
+    padding: 1rem;
+  }
+  
+  .overview-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .cards-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .card-box {
+    min-height: 300px;
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 0.875rem;
+  }
+  
+  .card p {
+    font-size: 1.25rem;
+  }
+  
+  .card h3 {
+    font-size: 0.75rem;
+  }
+  
+  .card-box {
+    min-height: 250px;
+    padding: 0.5rem;
+  }
+}

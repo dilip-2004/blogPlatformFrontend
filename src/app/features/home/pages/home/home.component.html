@@ -41,7 +41,7 @@
       <!-- Right Side: Action Buttons -->
       <div class="header-right">
         <div class="action-buttons" *ngIf="isAuthenticated">
-          <button class="action-btn write-btn" routerLink="/posts/write">
+          <button class="action-btn write-btn" routerLink="/write">
             <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
               <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" fill="currentColor"/>
             </svg>
@@ -59,7 +59,7 @@
           <div class="profile-dropdown" (click)="toggleUserMenu($event)">
             <button class="profile-btn" [class.active]="isUserMenuOpen">
               <img 
-                [src]="getUserProfilePicture() || getDefaultAvatar()" 
+                [src]="currentUser?.profile_picture || getDefaultAvatar()" 
                 [alt]="currentUser?.username || 'User'"
                 class="profile-avatar"
                 (error)="handleAvatarError($event)"
@@ -152,22 +152,22 @@
               
               <!-- Post Meta -->
               <div class="post-meta">
-              <div class="post-author">
-                <img 
-                  *ngIf="getAuthorProfilePictureUrl(post)"
-                  [src]="getAuthorProfilePictureUrl(post)" 
-                  [alt]="post.author.username || post.username"
-                  class="author-avatar"
-                  (error)="onImageError($event)"
-                />
-                <div 
-                  *ngIf="!getAuthorProfilePictureUrl(post)"
-                  class="author-avatar-placeholder"
-                >
-                  {{ getAuthorInitials(post) }}
+                <div class="post-author">
+                  <img 
+                    *ngIf="getImageUrl(post.author.profile_picture)"
+                    [src]="getImageUrl(post.author.profile_picture)" 
+                    [alt]="post.author.username"
+                    class="author-avatar"
+                    (error)="onImageError($event)"
+                  />
+                  <div 
+                    *ngIf="!getImageUrl(post.author.profile_picture)"
+                    class="author-avatar-placeholder"
+                  >
+                    {{ getFirstName(post.username).charAt(0).toUpperCase()  }}
+                  </div>
+                  <span class="author-name">{{ getFirstName(post.username) }}</span>
                 </div>
-                <span class="author-name">{{ getFirstName(post.username || 'Unknown') }}</span>
-              </div>
                 
                 <div class="post-dates">
                   <span class="post-date">Created: {{ post.created_at | dateFormat }}</span>

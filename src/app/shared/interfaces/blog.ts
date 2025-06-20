@@ -41,10 +41,5 @@ export interface SearchBlogsResponse {
   total_pages: number;
 }
 
-export interface PostsResponse {
-  posts: PostSummary[];
-  total: number;
-  page: number;
-  limit: number;
-  total_pages: number;
-}
+// PostsResponse is already defined in post.interface.ts
+// Use that one instead to avoid conflicts

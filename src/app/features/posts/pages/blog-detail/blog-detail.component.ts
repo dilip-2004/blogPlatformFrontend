@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { BlogService } from '../../../../core/services/blog.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { ProfilePictureService } from '../../../../core/services/profile-picture.service';
 import { Blog, BlogSummary, AiSummary } from '../../../../shared/interfaces/post.interface';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
@@ -57,10 +56,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   showComments = false;
   editingCommentId: string | null = null;
   editingCommentText = '';
-  updatingComment = false;
-  deletingCommentId: string | null = null;
-  showDeleteCommentModal = false;
-  selectedCommentForDelete: string | null = null;
 
   // Like properties
   isLiked = false;
@@ -73,7 +68,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     private router: Router,
     private blogService: BlogService,
     private authService: AuthService,
-    private profilePictureService: ProfilePictureService,
     private aiSummaryService: AiSummaryService,
     private commentService: CommentService,
     private likeService: LikeService
@@ -86,17 +80,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     } else {
       this.error = 'Blog ID not found';
     }
-    
-    // Subscribe to current user changes to trigger profile picture updates
-    this.authService.currentUser$.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(user => {
-      // Force change detection when user data changes to update profile pictures
-      if (this.blog && user) {
-        // The template will automatically re-evaluate getAuthorProfilePictureUrl()
-        // when the currentUser$ observable emits new data
-      }
-    });
   }
 
   ngOnDestroy(): void {
@@ -135,8 +118,8 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  getDisplayName(name?: string): string {
-    return name || '';
+  getFirstName(fullName?: string): string {
+    return fullName?.split('@')[0] || '';
   }
 
   loadBlog(): void {
@@ -399,19 +382,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   }
 
   startEditComment(comment: any): void {
-    // Validate authentication before allowing edit
-    if (!this.authService.isAuthenticated()) {
-      alert('You must be logged in to edit comments.');
-      return;
-    }
-    
-    // Validate permission
-    if (!this.canEditComment(comment)) {
-      alert('You do not have permission to edit this comment.');
-      return;
-    }
-    
-    console.log('Starting edit for comment:', comment._id);
     this.editingCommentId = comment._id;
     this.editingCommentText = comment.text;
   }
@@ -422,16 +392,8 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   }
 
   updateComment(): void {
-    if (!this.editingCommentId || !this.editingCommentText.trim() || this.updatingComment) return;
+    if (!this.editingCommentId || !this.editingCommentText.trim()) return;
     
-    // Validate authentication before proceeding
-    if (!this.authService.isAuthenticated()) {
-      alert('You must be logged in to edit comments.');
-      this.cancelEditComment();
-      return;
-    }
-    
-    this.updatingComment = true;
     const commentData: CommentCreate = {
       text: this.editingCommentText.trim()
     };
@@ -442,117 +404,39 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
       next: (updatedComment: any) => {
         const index = this.comments.findIndex(c => c._id === this.editingCommentId);
         if (index !== -1) {
-          // Preserve user information from the original comment if not returned
-          this.comments[index] = {
-            ...this.comments[index],
-            ...updatedComment,
-            updated_at: updatedComment.updated_at || new Date().toISOString()
-          };
+          this.comments[index] = updatedComment;
         }
-        this.updatingComment = false;
         this.cancelEditComment();
       },
       error: (error: any) => {
         console.error('Error updating comment:', error);
-        this.updatingComment = false;
-        
-        // Show user-friendly error message
-        let errorMessage = 'Failed to update comment. ';
-        if (error.status === 401) {
-          errorMessage += 'Please log in and try again.';
-          this.cancelEditComment();
-        } else if (error.status === 403) {
-          errorMessage += 'You do not have permission to edit this comment.';
-          this.cancelEditComment();
-        } else if (error.status === 404) {
-          errorMessage += 'Comment not found.';
-          this.loadComments(); // Refresh comments to sync state
-        } else {
-          errorMessage += 'Please try again.';
-        }
-        
-        alert(errorMessage);
       }
     });
   }
 
   deleteComment(commentId: string): void {
-    this.selectedCommentForDelete = commentId;
-    this.showDeleteCommentModal = true;
-  }
-
-  confirmDeleteComment(): void {
-    if (!this.selectedCommentForDelete) return;
+    if (!confirm('Are you sure you want to delete this comment?')) return;
     
-    // Validate authentication before proceeding
-    if (!this.authService.isAuthenticated()) {
-      alert('You must be logged in to delete comments.');
-      this.showDeleteCommentModal = false;
-      this.selectedCommentForDelete = null;
-      return;
-    }
-    
-    // Prevent multiple simultaneous delete operations
-    if (this.deletingCommentId === this.selectedCommentForDelete) return;
-
-    this.deletingCommentId = this.selectedCommentForDelete;
-    const commentIdToDelete = this.selectedCommentForDelete;
-
-    this.showDeleteCommentModal = false;
-    this.selectedCommentForDelete = null;
-    
-    this.commentService.deleteComment(this.deletingCommentId).pipe(
+    this.commentService.deleteComment(commentId).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
-        this.comments = this.comments.filter(c => c._id !== commentIdToDelete);
+        this.comments = this.comments.filter(c => c._id !== commentId);
         // Update blog comment count
         this.commentCount = Math.max(this.commentCount - 1, 0);
         if (this.blog) {
           this.blog.comment_count = this.commentCount;
         }
-        this.deletingCommentId = null;
-        
-        // Cancel edit mode if deleting the comment being edited
-        if (this.editingCommentId === commentIdToDelete) {
-          this.cancelEditComment();
-        }
       },
       error: (error: any) => {
         console.error('Error deleting comment:', error);
-        this.deletingCommentId = null;
-        
-        // Show user-friendly error message
-        let errorMessage = 'Failed to delete comment. ';
-        if (error.status === 401) {
-          errorMessage += 'Please log in and try again.';
-        } else if (error.status === 403) {
-          errorMessage += 'You do not have permission to delete this comment.';
-        } else if (error.status === 404) {
-          errorMessage += 'Comment not found. It may have already been deleted.';
-          this.loadComments(); // Refresh comments to sync state
-        } else {
-          errorMessage += 'Please try again.';
-        }
-        
-        alert(errorMessage);
       }
     });
   }
 
   canEditComment(comment: any): boolean {
-    const currentUser = this.authService.getCurrentUser();
-    const isAuthenticated = this.authService.isAuthenticated();
-    
-    if (!isAuthenticated || !currentUser || !comment) {
-      return false;
-    }
-    
-    // Handle both _id and id formats for user identification
-    const currentUserId = currentUser._id || currentUser.id;
-    const commentUserId = comment.user_id;
-    
-    return currentUserId === commentUserId;
+    return this.authService.isAuthenticated() && 
+           comment.user_id === this.authService.getCurrentUser()?._id;
   }
 
   // Like methods
@@ -646,56 +530,5 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     if (this.showSummarySidebar && !this.aiSummary && !this.summaryLoading && this.canManageSummary()) {
       this.generateAiSummary();
     }
-  }
-
-  // Get author profile picture URL
-  getAuthorProfilePictureUrl(): string | null {
-    // If the blog author is the current user, use current user's profile picture
-    const currentUser = this.authService.getCurrentUser();
-    
-    if (currentUser && this.blog) {
-      // Handle both 'id' and '_id' properties for user identification
-      const currentUserId = currentUser._id || currentUser.id;
-      
-      if (currentUserId === this.blog.user_id) {
-        // Use live current user data for own blogs
-        return this.profilePictureService.getUserProfilePictureUrl(currentUser);
-      }
-    }
-    
-    // For other users' blogs, try to use populated user data if available
-    if (this.blog) {
-      // Check if blog has populated user field with profile_picture
-      if (this.blog.user && this.blog.user.profile_picture) {
-        return this.profilePictureService.getUserProfilePictureUrl(this.blog.user);
-      }
-      
-      // Fallback: create a minimal user object for ProfilePictureService
-      // Note: this will likely return null since we don't have the profile_picture
-      const blogAuthor = {
-        _id: this.blog.user_id,
-        username: this.blog.username,
-        profile_picture: null // Blog interface doesn't include profile_picture
-      };
-      return this.profilePictureService.getUserProfilePictureUrl(blogAuthor);
-    }
-    
-    return null;
-  }
-
-  // Handle author image error
-  onAuthorImageError(event: Event): void {
-    this.profilePictureService.onImageError(event);
-  }
-
-  // Debug method for troubleshooting comment issues
-  debugCommentPermissions(comment: any): void {
-    console.log('=== Comment Debug Info ===');
-    console.log('Current User:', this.authService.getCurrentUser());
-    console.log('Is Authenticated:', this.authService.isAuthenticated());
-    console.log('Comment:', comment);
-    console.log('Can Edit Comment:', this.canEditComment(comment));
-    console.log('Auth Token Info:', this.authService.getTokenInfo?.());
-    console.log('========================');
   }
 }

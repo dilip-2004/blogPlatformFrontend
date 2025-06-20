@@ -2,18 +2,19 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { BlogService } from './blog.service';
-import { Blog, UpdateBlogRequest, BlogSummary } from '../../shared/interfaces/post.interface';
+import { Blog, UpdateBlogRequest } from '../../shared/interfaces/post.interface';
+import { EntityState } from '../../shared/interfaces/api.interface';
 
-interface BlogState {
-  blogs: Blog[];
-  loading: boolean;
-  error: string | null;
-  selectedBlog: Blog | null;
+interface BlogState extends EntityState<Blog> {
+  blogs: Blog[]; // alias for items
+  selectedBlog: Blog | null; // alias for selectedItem
   hasChanges: boolean;
   originalContent: string | null;
 }
 
 const initialState: BlogState = {
+  items: [], // EntityState requirement
+  selectedItem: null, // EntityState requirement
   blogs: [],
   loading: false,
   error: null,

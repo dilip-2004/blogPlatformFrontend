@@ -1,0 +1,69 @@
+<div class="dashboard-wrapper">
+  <!-- Filter Header -->
+  <div class="dashboard-header">
+    <div class="flex">
+      <div>
+        <h2>Chart.js Dashboard</h2>
+        <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">Interactive analytics with Chart.js library</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <label style="font-weight: 500; opacity: 0.9;">Time Range:</label>
+        <select (change)="onRangeChange($event)">
+          <option value="7d">Last 7 Days</option>
+          <option value="6m">Last 6 Months</option>
+          <option value="1y">Last 1 Year</option>
+          <option value="all" selected>All Time</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-cards-grid">
+    <div class="stat-card">
+      <span class="stat-value">{{ totals.total_posts }}</span>
+      <span class="stat-label">Total Posts</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ totals.total_users }}</span>
+      <span class="stat-label">Total Users</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ totals.total_comments }}</span>
+      <span class="stat-label">Total Comments</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ totals.total_likes }}</span>
+      <span class="stat-label">Total Likes</span>
+    </div>
+  </div>
+
+  <!-- Charts Grid -->
+  <div class="charts-grid">
+    <div class="chart-container">
+      <div class="chart-wrapper">
+        <canvas id="postsChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-wrapper">
+        <canvas id="usersChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-wrapper">
+        <canvas id="likesChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-wrapper">
+        <canvas id="tagsChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-wrapper">
+        <canvas id="categoryChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>

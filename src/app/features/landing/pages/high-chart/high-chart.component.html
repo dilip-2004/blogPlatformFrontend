@@ -1,0 +1,36 @@
+<div class="dashboard-wrapper">
+  <!-- Dashboard Header -->
+  <div class="overview-header">
+    <h2>HighCharts Dashboard</h2>
+    <p>Interactive analytics with HighCharts library</p>
+  </div>
+
+  <!-- Totals Cards -->
+  <div class="cards-container">
+    <div class="card">
+      <h3>Posts</h3>
+      <p>{{ totals.total_posts }}</p>
+    </div>
+    <div class="card">
+      <h3>Users</h3>
+      <p>{{ totals.total_users }}</p>
+    </div>
+    <div class="card">
+      <h3>Likes</h3>
+      <p>{{ totals.total_likes }}</p>
+    </div>
+    <div class="card">
+      <h3>Comments</h3>
+      <p>{{ totals.total_comments }}</p>
+    </div>
+  </div>
+
+  <!-- Charts Grid -->
+  <div class="charts-grid">
+    <div id="postsOverTime" class="card-box"></div>
+    <div id="newUsersOverTime" class="card-box"></div>
+    <div id="postsByCategory" class="card-box"></div>
+    <div id="mostPopularCategory" class="card-box"></div>
+    <div id="mostLikedPosts" class="card-box"></div>
+  </div>
+</div>

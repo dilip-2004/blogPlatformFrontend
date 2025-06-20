@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap, catchError, throwError, timer, switchMap, of, map } from 'rxjs';
+import { BehaviorSubject, Observable, tap, catchError, throwError, timer, map } from 'rxjs';
 import { Router } from '@angular/router';
 import { User, LoginRequest, LoginResponse, CreateUserRequest } from '../../shared/interfaces';
 import { environment } from '../../../environments/environment';
@@ -218,21 +218,11 @@ export class AuthService {
   }
 
   updateProfile(userData: Partial<User>): Observable<User> {
-    // Use different endpoints based on what's being updated
-    const endpoint = userData.profile_picture !== undefined 
-      ? `${this.apiUrl}/update-profile-picture`
-      : `${this.apiUrl}/update-username`;
-      
-    return this.http.put<User>(endpoint, userData)
+    return this.http.put<User>(`${this.apiUrl}/update-username`, userData)
       .pipe(
         tap(user => {
-          console.log('Profile updated, new user data:', user);
-          // Store updated user data
           sessionStorage.setItem('current_user', JSON.stringify(user));
-          // Force update the current user subject to trigger UI refresh
           this.currentUserSubject.next(user);
-          // Also update any cached user data
-          this.refreshUserData();
         })
       );
   }
@@ -245,44 +235,9 @@ export class AuthService {
     });
   }
 
-  requestPasswordReset(email: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/forgot-password`, { email });
-  }
-
-  resetPassword(token: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/reset-password`, {
-      token,
-      new_password: newPassword
-    });
-  }
-
-  verifyEmail(token: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/verify-email`, { token });
-  }
-
-  resendVerificationEmail(email: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/resend-verification`, { email });
-  }
 
   getUserById(userId: string): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/users/${userId}`);
-  }
-
-  // Refresh user data to ensure UI consistency
-  private refreshUserData(): void {
-    // Force a fresh read from session storage
-    const storedUser = sessionStorage.getItem('current_user');
-    if (storedUser) {
-      try {
-        const user = JSON.parse(storedUser);
-        // Emit the updated user to trigger UI refresh in all components
-        setTimeout(() => {
-          this.currentUserSubject.next(user);
-        }, 100); // Small delay to ensure the update is processed
-      } catch (error) {
-        console.error('Error parsing stored user data:', error);
-      }
-    }
   }
 
   // Debug methods
