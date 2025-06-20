@@ -16,7 +16,10 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   isLoading = false;
   errorMessage = '';
   successMessage = '';
+<<<<<<< HEAD
   isUnregisteredEmail = false;
+=======
+>>>>>>> a7a8f08 (feat: home component)
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -52,7 +55,10 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     if (this.forgotPasswordForm.valid) {
       this.errorMessage = '';
       this.successMessage = '';
+<<<<<<< HEAD
       this.isUnregisteredEmail = false;
+=======
+>>>>>>> a7a8f08 (feat: home component)
 
       const email = this.forgotPasswordForm.value.email;
 
@@ -64,7 +70,12 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Forgot password error:', error);
+<<<<<<< HEAD
             this.errorMessage = this.getForgotPasswordErrorMessage(error);
+=======
+            this.errorMessage = error.error?.message || 
+                              'Failed to send reset email. Please try again.';
+>>>>>>> a7a8f08 (feat: home component)
           }
         });
     } else {
@@ -89,6 +100,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     const field = this.forgotPasswordForm.get(fieldName);
     return !!(field?.errors && field.touched);
   }
+<<<<<<< HEAD
 
   private getForgotPasswordErrorMessage(error: any): string {
     // Reset unregistered email state
@@ -174,4 +186,6 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
         return 'Failed to send password reset email. Please try again.';
     }
   }
+=======
+>>>>>>> a7a8f08 (feat: home component)
 }

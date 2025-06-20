@@ -3,7 +3,10 @@ export interface User {
   id?: string;  // Legacy id for compatibility
   username: string;
   email: string;
+<<<<<<< HEAD
   email_verified?: boolean; // Email verification status
+=======
+>>>>>>> a7a8f08 (feat: home component)
   full_name?: string;
   bio?: string;
   profile_picture?: string;
@@ -17,6 +20,7 @@ export interface User {
   updated_at?: string;
 }
 
+<<<<<<< HEAD
 
 // User Interests interfaces
 export interface UserInterests {
@@ -35,10 +39,16 @@ export interface UserInterestsUpdate {
   interests: string[];
 }
 
+=======
+>>>>>>> a7a8f08 (feat: home component)
 export interface CreateUserRequest {
   username: string;
   email: string;
   password: string;
+<<<<<<< HEAD
+=======
+  full_name?: string;
+>>>>>>> a7a8f08 (feat: home component)
   confirm_password?: string;
 }
 

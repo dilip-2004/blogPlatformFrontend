@@ -109,7 +109,56 @@ export class BlogService {
     };
 
     return this.getBlogs(blogFilters).pipe(
+<<<<<<< HEAD
       switchMap(blogResponse => this.convertBlogsResponseToPostsResponse(blogResponse))
+=======
+      switchMap(blogResponse => {
+        const blogs = blogResponse.blogs.filter(blog => blog && blog._id);
+        
+        // Get unique user IDs that need to be fetched
+        const userIds = [...new Set(blogs.map(blog => blog.user_id).filter(id => id))];
+        
+        // Fetch user data for all unique user IDs
+        const userRequests = userIds.map(userId => this.getUserInfo(userId));
+        
+        if (userRequests.length === 0) {
+          // No users to fetch, return with default author info
+          const posts: PostSummary[] = blogs.map(blog => this.mapBlogToPost(blog, null));
+          return of({
+            posts,
+            total: blogResponse.total,
+            page: blogResponse.page,
+            limit: blogResponse.limit,
+            total_pages: blogResponse.total_pages
+          });
+        }
+        
+        return forkJoin(userRequests).pipe(
+          map(users => {
+            // Create a map of user data by user ID
+            const userMap = new Map();
+            users.forEach(user => {
+              if (user && user.id) {
+                userMap.set(user.id, user);
+              }
+            });
+            
+            const posts: PostSummary[] = blogs.map(blog => {
+              const userInfo = userMap.get(blog.user_id);
+              return this.mapBlogToPost(blog, userInfo);
+            });
+            
+            return {
+              posts,
+              total: blogResponse.total,
+              page: blogResponse.page,
+              limit: blogResponse.limit,
+              total_pages: blogResponse.total_pages
+            };
+          })
+        );
+      })
+>>>>>>> a7a8f08 (feat: home component)
     );
   }
 
@@ -121,14 +170,20 @@ searchPosts(query: string, page = 1, limit = 10): Observable<PostsResponse> {
 
   // 2. Attempt dedicated search
   return this.searchBlogs(query, page, limit).pipe(
+<<<<<<< HEAD
     // 3. Transform successful search response with user data fetching
     switchMap(searchResponse => this.transformSearchResponse(searchResponse, limit)),
+=======
+    // 3. Transform successful search response
+    map(searchResponse => this.transformSearchResponse(searchResponse, limit)),
+>>>>>>> a7a8f08 (feat: home component)
     
     // 4. Fallback if search fails
     catchError(error => this.handleSearchError(query, page, limit, error))
   );
 }
 
+<<<<<<< HEAD
 // Helper method for transformation with user data fetching
 private transformSearchResponse(response: SearchBlogsResponse, limit: number): Observable<PostsResponse> {
   const blogs = response.blogs.map(item => 
@@ -185,6 +240,21 @@ private transformSearchResponse(response: SearchBlogsResponse, limit: number): O
       };
     })
   );
+=======
+// Helper method for transformation
+private transformSearchResponse(response: SearchBlogsResponse, limit: number): PostsResponse {
+  const blogs = response.blogs.map(item => 
+    'blog' in item ? item.blog : item
+  );
+
+  return {
+    posts: blogs.map(blog => this.mapBlogToPost(blog, null)),
+    total: response.total,
+    page: response.page,
+    limit: response.page_size, // Convert backend's page_size to frontend's limit
+    total_pages: response.total_pages
+  };
+>>>>>>> a7a8f08 (feat: home component)
 }
 
 // Helper method for error handling
@@ -197,7 +267,17 @@ private handleSearchError(query: string, page: number, limit: number, error: any
     limit,
     published: true 
   }).pipe(
+<<<<<<< HEAD
     switchMap(blogsResponse => this.convertBlogsResponseToPostsResponse(blogsResponse)),
+=======
+    map(blogsResponse => ({
+      posts: blogsResponse.blogs.map(blog => this.mapBlogToPost(blog, null)),
+      total: blogsResponse.total,
+      page: blogsResponse.page,
+      limit: blogsResponse.limit,
+      total_pages: blogsResponse.total_pages
+    })),
+>>>>>>> a7a8f08 (feat: home component)
     catchError(() => of(this.createEmptyResponse(page, limit)))
   );
 }
@@ -215,7 +295,11 @@ private createEmptyResponse(page: number, limit: number): PostsResponse {
 
   getPostsByTag(tag: string, page = 1, limit = 10): Observable<PostsResponse> {
     return this.getBlogsByTag(tag, page, limit).pipe(
+<<<<<<< HEAD
       switchMap(blogResponse => this.convertBlogsResponseToPostsResponse(blogResponse))
+=======
+      map(blogResponse => this.convertBlogsToPostsResponse(blogResponse))
+>>>>>>> a7a8f08 (feat: home component)
     );
   }
 
@@ -255,17 +339,26 @@ private createEmptyResponse(page: number, limit: number): PostsResponse {
 
   private convertBlogsResponseToPostsResponse(blogResponse: BlogsResponse): Observable<PostsResponse> {
     const blogs = blogResponse.blogs.filter(blog => blog && blog._id);
+<<<<<<< HEAD
     console.log('🏗️ Converting blogs to posts, blogs:', blogs.length);
     
     // Get unique user IDs that need to be fetched
     const userIds = [...new Set(blogs.map(blog => blog.user_id).filter(id => id))];
     console.log('👥 User IDs to fetch:', userIds);
+=======
+    
+    // Get unique user IDs that need to be fetched
+    const userIds = [...new Set(blogs.map(blog => blog.user_id).filter(id => id))];
+>>>>>>> a7a8f08 (feat: home component)
     
     // Fetch user data for all unique user IDs
     const userRequests = userIds.map(userId => this.getUserInfo(userId));
     
     if (userRequests.length === 0) {
+<<<<<<< HEAD
       console.log('⚠️ No user requests needed');
+=======
+>>>>>>> a7a8f08 (feat: home component)
       const posts: PostSummary[] = blogs.map(blog => this.mapBlogToPost(blog, null));
       return of({
         posts,
@@ -278,6 +371,7 @@ private createEmptyResponse(page: number, limit: number): PostsResponse {
     
     return forkJoin(userRequests).pipe(
       map(users => {
+<<<<<<< HEAD
         console.log('👥 Fetched all users:', users);
         const userMap = new Map();
         users.forEach(user => {
@@ -298,6 +392,17 @@ private createEmptyResponse(page: number, limit: number): PostsResponse {
           console.log(`🔗 Mapping blog ${blog._id} with user_id ${blog.user_id}, found userInfo:`, userInfo);
           console.log('🗺️ Available userMap keys:', Array.from(userMap.keys()));
           console.log('🔍 Looking for user_id:', blog.user_id, 'type:', typeof blog.user_id);
+=======
+        const userMap = new Map();
+        users.forEach(user => {
+          if (user && user.id) {
+            userMap.set(user.id, user);
+          }
+        });
+        
+        const posts: PostSummary[] = blogs.map(blog => {
+          const userInfo = userMap.get(blog.user_id);
+>>>>>>> a7a8f08 (feat: home component)
           return this.mapBlogToPost(blog, userInfo);
         });
         
@@ -313,6 +418,7 @@ private createEmptyResponse(page: number, limit: number): PostsResponse {
   }
 
   private mapBlogToPost(blog: any, userInfo: any): PostSummary {
+<<<<<<< HEAD
     // Use blog.username as the primary source, fallback to userInfo only if blog.username is not available
     const primaryUsername = blog.username || userInfo?.username || 'Unknown';
     
@@ -337,16 +443,35 @@ private createEmptyResponse(page: number, limit: number): PostsResponse {
       author: {
         id: blog.user?._id || blog.user_id,
         username: primaryUsername,
+=======
+    return {
+      id: blog._id,
+      title: blog.title || 'Untitled',
+      excerpt: blog.excerpt || this.generateExcerpt(blog.blog_body || blog.content),
+      slug: this.generateSlug(blog.title),
+      status: blog.published ? 'published' : 'draft',
+      featured_image: blog.main_image_url,
+      author_id: blog.user_id,
+      username: userInfo?.username || blog.username || 'Unknown',
+      author: {
+        id: blog.user?._id || blog.user_id,
+        username: userInfo?.username || blog.user?.username || 'Unknown',
+>>>>>>> a7a8f08 (feat: home component)
         profile_picture: userInfo?.profile_picture || blog.user?.profile_picture
       },
       tags: Array.isArray(blog.tags) ? (typeof blog.tags[0] === 'string' ? blog.tags as string[] : (blog.tags as any[]).map(tag => tag.name || tag)) : [],
       views: blog.views || 0,
       likes_count: blog.likes_count || 0,
+<<<<<<< HEAD
       comment_count: blog.comment_count || 0,
+=======
+      comments_count: blog.comments_count || 0,
+>>>>>>> a7a8f08 (feat: home component)
       is_liked: blog.is_liked || false,
       created_at: blog.created_at,
       updated_at: blog.updated_at
     };
+<<<<<<< HEAD
     
     console.log('📄 mapBlogToPost - Mapped post result:', {
       id: mappedPost.id,
@@ -376,11 +501,28 @@ private createEmptyResponse(page: number, limit: number): PostsResponse {
         console.log('✅ Successfully fetched user data:', user);
         console.log('🖼️ User profile_picture specifically:', user?.profile_picture);
         console.log('🔑 User object keys:', Object.keys(user || {}));
+=======
+  }
+
+  private getUserInfo(userId: string): Observable<any> {
+    // Check cache first
+    if (this.userCache.has(userId)) {
+      return of(this.userCache.get(userId));
+    }
+    
+    // Fetch user info and cache it
+    return this.authService.getUserById(userId).pipe(
+      map(user => {
+>>>>>>> a7a8f08 (feat: home component)
         this.userCache.set(userId, user);
         return user;
       }),
       catchError(error => {
+<<<<<<< HEAD
         console.warn(`❌ Failed to fetch user info for ID ${userId}:`, error);
+=======
+        console.warn(`Failed to fetch user info for ID ${userId}:`, error);
+>>>>>>> a7a8f08 (feat: home component)
         // Return a fallback user object
         const fallbackUser = { id: userId, username: 'Unknown', profile_picture: null };
         this.userCache.set(userId, fallbackUser);

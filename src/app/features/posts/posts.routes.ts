@@ -8,6 +8,7 @@ export const postsRoutes: Routes = [
     canActivate: [authGuard]
   },
   {
+<<<<<<< HEAD
     path: 'write',
     loadComponent: () => import('./pages/blog-writer/blog-writer.component').then(c => c.BlogWriterComponent),
     canActivate: [authGuard]
@@ -18,6 +19,8 @@ export const postsRoutes: Routes = [
     canActivate: [authGuard]
   },
   {
+=======
+>>>>>>> a7a8f08 (feat: home component)
     path: 'edit/:id',
     loadComponent: () => import('./pages/edit-blog/edit-blog.component').then(c => c.EditBlogComponent),
     canActivate: [authGuard]

@@ -3,16 +3,25 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { BlogStateService } from '../../../../core/services/blog-state.service';
+<<<<<<< HEAD
 import { AuthService } from '../../../../core/services/auth.service';
 import { ProfilePictureService } from '../../../../core/services/profile-picture.service';
 import { Blog } from '../../../../shared/interfaces/post.interface';
 import { FooterComponent } from "../../../../shared/components/footer/footer.component";
 import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
+=======
+import { Blog } from '../../../../shared/interfaces/post.interface';
+import { FooterComponent } from "../../../../shared/components/footer/footer.component";
+>>>>>>> a7a8f08 (feat: home component)
 
 @Component({
   selector: 'app-my-blogs',
   standalone: true,
+<<<<<<< HEAD
   imports: [CommonModule, FooterComponent, DateFormatPipe],
+=======
+  imports: [CommonModule, FooterComponent],
+>>>>>>> a7a8f08 (feat: home component)
   templateUrl: './my-blogs.component.html',
   styleUrl: './my-blogs.component.css'
 })
@@ -27,8 +36,11 @@ export class MyBlogsComponent implements OnInit, OnDestroy {
 
   constructor(
     private blogStateService: BlogStateService,
+<<<<<<< HEAD
     private authService: AuthService,
     private profilePictureService: ProfilePictureService,
+=======
+>>>>>>> a7a8f08 (feat: home component)
     private router: Router
   ) {}
 
@@ -120,6 +132,19 @@ export class MyBlogsComponent implements OnInit, OnDestroy {
     return published ? 'Published' : 'Draft';
   }
 
+<<<<<<< HEAD
+=======
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+>>>>>>> a7a8f08 (feat: home component)
 
   getContentPreview(blog: Blog): string {
     // Handle both API response format (blog_body) and localStorage format (content)
@@ -146,7 +171,11 @@ export class MyBlogsComponent implements OnInit, OnDestroy {
   }
 
   navigateToWrite(): void {
+<<<<<<< HEAD
     this.router.navigate(['/posts/write']);
+=======
+    this.router.navigate(['/write']);
+>>>>>>> a7a8f08 (feat: home component)
   }
 
   navigateToHome(): void {
@@ -208,6 +237,7 @@ export class MyBlogsComponent implements OnInit, OnDestroy {
       target.src = this.getPlaceholderImage();
     }
   }
+<<<<<<< HEAD
 
   // Navigate to blog detail page
   navigateToBlogDetail(blog: Blog): void {
@@ -220,5 +250,7 @@ export class MyBlogsComponent implements OnInit, OnDestroy {
     console.log('Navigating to blog detail with ID:', blogId);
     this.router.navigate(['/posts/detail', blogId]);
   }
+=======
+>>>>>>> a7a8f08 (feat: home component)
 }
 

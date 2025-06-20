@@ -18,9 +18,12 @@ export class LoginComponent implements OnInit, OnDestroy {
   errorMessage = '';
   returnUrl = '/';
   showPassword = false;
+<<<<<<< HEAD
   isEmailUnverified = false;
   resendingVerification = false;
   verificationSentMessage = '';
+=======
+>>>>>>> a7a8f08 (feat: home component)
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -39,12 +42,15 @@ export class LoginComponent implements OnInit, OnDestroy {
     // Get return url from route parameters or default to '/home'
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
     
+<<<<<<< HEAD
     // Check for success message from email verification
     const message = this.route.snapshot.queryParams['message'];
     if (message) {
       this.verificationSentMessage = message;
     }
     
+=======
+>>>>>>> a7a8f08 (feat: home component)
     // Redirect if already authenticated
     if (this.authService.isAuthenticated()) {
       this.router.navigate([this.returnUrl]);
@@ -69,7 +75,11 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.errorMessage = '';
 
       const credentials = {
+<<<<<<< HEAD
         email: this.loginForm.value.email.toLowerCase().trim(),
+=======
+        email: this.loginForm.value.email,
+>>>>>>> a7a8f08 (feat: home component)
         password: this.loginForm.value.password
       };
 
@@ -80,7 +90,13 @@ export class LoginComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Login error:', error);
+<<<<<<< HEAD
             this.errorMessage = this.getLoginErrorMessage(error);
+=======
+            this.errorMessage = error.error?.message || 
+                              error.error?.detail || 
+                              'Login failed. Please check your credentials.';
+>>>>>>> a7a8f08 (feat: home component)
           }
         });
     } else {
@@ -115,6 +131,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     const field = this.loginForm.get(fieldName);
     return !!(field?.errors && field.touched);
   }
+<<<<<<< HEAD
   
   resendVerificationEmail(): void {
     if (!this.loginForm.value.email) {
@@ -282,4 +299,6 @@ export class LoginComponent implements OnInit, OnDestroy {
         return 'Failed to send verification email. Please try again.';
     }
   }
+=======
+>>>>>>> a7a8f08 (feat: home component)
 }

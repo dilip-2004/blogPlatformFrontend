@@ -272,12 +272,16 @@
   right: 1rem;
   opacity: 0;
   transition: opacity 0.3s ease;
+<<<<<<< HEAD
   z-index: 50; /* Highest z-index to always stay above everything */
   pointer-events: auto;
+=======
+>>>>>>> a7a8f08 (feat: home component)
 }
 
 .content-block:hover .block-controls {
   opacity: 1;
+<<<<<<< HEAD
   z-index: 50 !important; /* Ensure controls are always visible */
 }
 
@@ -285,6 +289,8 @@
 .block-controls:hover {
   opacity: 1 !important;
   z-index: 50 !important;
+=======
+>>>>>>> a7a8f08 (feat: home component)
 }
 
 .control-group {
@@ -295,6 +301,7 @@
   border-radius: 8px;
   padding: 0.25rem;
   backdrop-filter: blur(10px);
+<<<<<<< HEAD
   position: relative;
   z-index: 100; /* Highest z-index for control buttons */
   pointer-events: auto;
@@ -305,6 +312,8 @@
 .control-group:focus,
 .control-group:focus-within {
   z-index: 100 !important;
+=======
+>>>>>>> a7a8f08 (feat: home component)
 }
 
 .control-btn {
@@ -445,7 +454,10 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+<<<<<<< HEAD
   margin-right: 130px; /* Reserve space for block controls */
+=======
+>>>>>>> a7a8f08 (feat: home component)
 }
 
 .image-preview img {
@@ -460,6 +472,7 @@
   font-size: 0.8rem;
   color: #9ca3af;
   word-break: break-all;
+<<<<<<< HEAD
   margin-top: 8px;
   margin-right: 130px; /* Increased margin to prevent overlap with block controls */
   padding: 8px 12px;
@@ -478,6 +491,8 @@
 .image-url-display:focus-within,
 .image-url-display:active {
   z-index: 1 !important; /* Force low z-index even on focus */
+=======
+>>>>>>> a7a8f08 (feat: home component)
 }
 
 /* Add Block Controls */
@@ -486,6 +501,7 @@
   justify-content: center;
   margin: 1rem 0;
   position: relative;
+<<<<<<< HEAD
   transition: all 0.3s ease; /* Smooth transition for spacing changes */
 }
 
@@ -493,6 +509,8 @@
 .add-block-container.menu-open {
   margin-bottom: 150px; /* Increased space when menu is open to prevent overlap */
   padding-bottom: 20px; /* Additional padding for menu space */
+=======
+>>>>>>> a7a8f08 (feat: home component)
 }
 
 .add-block-btn {
@@ -509,8 +527,11 @@
   color: #9ca3af;
   opacity: 0.6;
   backdrop-filter: blur(10px);
+<<<<<<< HEAD
   position: relative;
   z-index: 1001; /* Ensure plus buttons are always clickable */
+=======
+>>>>>>> a7a8f08 (feat: home component)
 }
 
 .add-block-btn:hover {
@@ -528,7 +549,10 @@
   border-color: #667eea;
   color: #667eea;
   background: rgba(102, 126, 234, 0.1);
+<<<<<<< HEAD
   z-index: 1001; /* Slightly higher than menu to stay clickable */
+=======
+>>>>>>> a7a8f08 (feat: home component)
 }
 
 /* Add Menu */
@@ -545,10 +569,16 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+<<<<<<< HEAD
   z-index: 1000; /* Much higher z-index to ensure it's always on top */
   min-width: 150px;
   backdrop-filter: blur(20px);
   pointer-events: auto; /* Ensure menu can receive interactions */
+=======
+  z-index: 10;
+  min-width: 150px;
+  backdrop-filter: blur(20px);
+>>>>>>> a7a8f08 (feat: home component)
 }
 
 .menu-item {
@@ -630,7 +660,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+<<<<<<< HEAD
   z-index: 1009;
+=======
+  z-index: 1000;
+>>>>>>> a7a8f08 (feat: home component)
   padding: 1rem;
 }
 
@@ -922,7 +956,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+<<<<<<< HEAD
   z-index: 1011;
+=======
+  z-index: 1000;
+>>>>>>> a7a8f08 (feat: home component)
   padding: 1.5rem;
 }
 

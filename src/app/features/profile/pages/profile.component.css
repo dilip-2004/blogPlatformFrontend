@@ -74,6 +74,7 @@
   opacity: 0;
   animation: fadeInScale 1.2s ease-out 0.2s forwards;
   display: flex;
+<<<<<<< HEAD
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -88,6 +89,10 @@
 
 .profile-avatar-container:hover {
   transform: scale(1.05);
+=======
+  justify-content: center;
+  align-items: center;
+>>>>>>> a7a8f08 (feat: home component)
 }
 
 .profile-avatar {
@@ -126,6 +131,7 @@
   color: #fff;
 }
 
+<<<<<<< HEAD
 /* Profile Picture Upload Overlay */
 .avatar-upload-overlay {
   position: absolute;
@@ -192,6 +198,8 @@
   transform: scale(0.95);
 }
 
+=======
+>>>>>>> a7a8f08 (feat: home component)
 /* Profile Info */
 .profile-info {
   color: #ffffff;
@@ -404,6 +412,7 @@
   animation: fadeInUp 0.3s ease-out;
 }
 
+<<<<<<< HEAD
 /* Readonly Form Input */
 .form-section .form-input.readonly {
   background: rgba(31, 41, 55, 0.3);
@@ -444,6 +453,8 @@
   line-height: 1.5;
 }
 
+=======
+>>>>>>> a7a8f08 (feat: home component)
 /* Form Layout */
 .auth-form {
   display: flex;
@@ -457,6 +468,7 @@
   gap: 0.5rem;
 }
 
+<<<<<<< HEAD
 /* Password Strength Indicator */
 .password-strength-container {
   margin-top: 0.75rem;
@@ -525,6 +537,8 @@
   background: #22c55e;
 }
 
+=======
+>>>>>>> a7a8f08 (feat: home component)
 /* Submit Button - Landing Page Style */
 .form-section button[type="submit"] {
   display: inline-flex;
@@ -638,6 +652,7 @@
   z-index: 1;
 }
 
+<<<<<<< HEAD
 .button-text,
 .button-arrow,
 .loading-content {
@@ -677,6 +692,8 @@
   }
 }
 
+=======
+>>>>>>> a7a8f08 (feat: home component)
 /* Message Styling */
 .form-section .bg-green-50,
 .form-section .bg-red-50 {
@@ -822,12 +839,15 @@
   .profile-name {
     font-size: 1.5rem;
   }
+<<<<<<< HEAD
   
   .password-strength-header {
     flex-direction: column;
     gap: 0.25rem;
     align-items: flex-start;
   }
+=======
+>>>>>>> a7a8f08 (feat: home component)
 }
 
 /* High contrast mode support */

@@ -218,6 +218,7 @@ export class AuthService {
   }
 
   updateProfile(userData: Partial<User>): Observable<User> {
+<<<<<<< HEAD
     // Use different endpoints based on what's being updated
     const endpoint = userData.profile_picture !== undefined 
       ? `${this.apiUrl}/update-profile-picture`
@@ -233,6 +234,13 @@ export class AuthService {
           this.currentUserSubject.next(user);
           // Also update any cached user data
           this.refreshUserData();
+=======
+    return this.http.put<User>(`${this.apiUrl}/profile`, userData)
+      .pipe(
+        tap(user => {
+          sessionStorage.setItem('current_user', JSON.stringify(user));
+          this.currentUserSubject.next(user);
+>>>>>>> a7a8f08 (feat: home component)
         })
       );
   }
@@ -260,14 +268,20 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/verify-email`, { token });
   }
 
+<<<<<<< HEAD
   resendVerificationEmail(email: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/resend-verification`, { email });
+=======
+  resendVerificationEmail(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/resend-verification`, {});
+>>>>>>> a7a8f08 (feat: home component)
   }
 
   getUserById(userId: string): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/users/${userId}`);
   }
 
+<<<<<<< HEAD
   // Refresh user data to ensure UI consistency
   private refreshUserData(): void {
     // Force a fresh read from session storage
@@ -285,6 +299,8 @@ export class AuthService {
     }
   }
 
+=======
+>>>>>>> a7a8f08 (feat: home component)
   // Debug methods
   getRefreshTimerStatus(): boolean {
     return !!this.refreshTokenTimer;

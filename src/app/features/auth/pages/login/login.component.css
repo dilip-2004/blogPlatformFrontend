@@ -91,6 +91,7 @@
   flex-shrink: 0;
 }
 
+<<<<<<< HEAD
 /* Success Message */
 .success-message {
   display: flex;
@@ -167,6 +168,8 @@
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
+=======
+>>>>>>> a7a8f08 (feat: home component)
 
 /* Form Styles */
 .auth-form {

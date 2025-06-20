@@ -5,7 +5,10 @@ import { Comment } from './comment.interface';
 export interface Blog {
   _id: string;
   user_id: string;
+<<<<<<< HEAD
   username:string;
+=======
+>>>>>>> a7a8f08 (feat: home component)
   title: string;
   content: string;
   tags: string[];  // Changed from tag_ids to tags to match backend
@@ -17,6 +20,10 @@ export interface Blog {
   user?: User;
   views?: number;
   likes_count?: number;
+<<<<<<< HEAD
+=======
+  comments_count?: number;
+>>>>>>> a7a8f08 (feat: home component)
   comment_count?: number;
 }
 
@@ -94,7 +101,11 @@ export interface BlogSummary {
   tags?: Pick<Tag, '_id' | 'name'>[] | string[];  // Can be tag objects or tag names
   views?: number;
   likes_count?: number;
+<<<<<<< HEAD
   comment_count?: number;
+=======
+  comments_count?: number;
+>>>>>>> a7a8f08 (feat: home component)
 }
 
 export interface BlogsResponse {
@@ -105,6 +116,7 @@ export interface BlogsResponse {
   total_pages: number;
 }
 
+<<<<<<< HEAD
 // AI Summary interface
 export interface AiSummary {
   _id: string;
@@ -120,6 +132,8 @@ export interface AiSummaryCreate {
   blog_content: string;
 }
 
+=======
+>>>>>>> a7a8f08 (feat: home component)
 export interface CreateBlogRequest {
   title: string;
   content: string;
@@ -170,7 +184,11 @@ export interface PostSummary {
   tags: string[];
   views: number;
   likes_count: number;
+<<<<<<< HEAD
   comment_count: number;
+=======
+  comments_count: number;
+>>>>>>> a7a8f08 (feat: home component)
   is_liked?: boolean;
   created_at: string;
   updated_at?: string;

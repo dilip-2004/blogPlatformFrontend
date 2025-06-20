@@ -11,11 +11,14 @@ export const routes: Routes = [
     loadChildren: () => import('./features/auth/auth.routes').then(m => m.authRoutes)
   },
   {
+<<<<<<< HEAD
     path: 'reset-password',
     redirectTo: '/auth/reset-password',
     pathMatch: 'full'
   },
   {
+=======
+>>>>>>> a7a8f08 (feat: home component)
     path: 'landing',
     loadChildren: () => import('./features/landing/landing.routes').then(m => m.landingRoutes)
   },
@@ -25,8 +28,12 @@ export const routes: Routes = [
   },
   {
     path: 'write',
+<<<<<<< HEAD
     redirectTo: '/posts/write',
     pathMatch: 'full'
+=======
+    loadChildren: () => import('./features/blog-editor/blog-editor.routes').then(m => m.blogEditorRoutes)
+>>>>>>> a7a8f08 (feat: home component)
   },
   {
     path: 'posts',

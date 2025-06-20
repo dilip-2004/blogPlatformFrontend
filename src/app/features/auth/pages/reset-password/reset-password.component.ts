@@ -144,7 +144,12 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Reset password error:', error);
+<<<<<<< HEAD
             this.errorMessage = this.getResetPasswordErrorMessage(error);
+=======
+            this.errorMessage = error.error?.message || 
+                              'Failed to reset password. The token may be expired or invalid.';
+>>>>>>> a7a8f08 (feat: home component)
           }
         });
     } else {
@@ -191,6 +196,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     };
     return displayNames[fieldName] || fieldName;
   }
+<<<<<<< HEAD
 
   private getResetPasswordErrorMessage(error: any): string {
     // Check for network errors first
@@ -282,4 +288,6 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
         return 'Failed to reset password. The reset link may be expired or invalid.';
     }
   }
+=======
+>>>>>>> a7a8f08 (feat: home component)
 }

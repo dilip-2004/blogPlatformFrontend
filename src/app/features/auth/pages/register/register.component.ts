@@ -33,7 +33,11 @@ export function passwordStrengthValidator(): ValidatorFn {
     const hasNumber = /[0-9]/.test(value);
     const hasUpper = /[A-Z]/.test(value);
     const hasLower = /[a-z]/.test(value);
+<<<<<<< HEAD
     const hasSpecial = /[^A-Za-z0-9]/.test(value);
+=======
+    const hasSpecial = /[#?!@$%^&*-]/.test(value);
+>>>>>>> a7a8f08 (feat: home component)
     
     const valid = hasNumber && hasUpper && hasLower && hasSpecial;
     if (!valid) {
@@ -66,6 +70,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
     private router: Router
   ) {
     this.registerForm = this.fb.group({
+<<<<<<< HEAD
+=======
+      full_name: ['', [Validators.required, Validators.minLength(2)]],
+>>>>>>> a7a8f08 (feat: home component)
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8), passwordStrengthValidator()]],
       confirm_password: ['', [Validators.required, passwordMatchValidator('password')]]
@@ -138,12 +146,19 @@ export class RegisterComponent implements OnInit, OnDestroy {
       this.errorMessage = '';
       this.successMessage = '';
 
+<<<<<<< HEAD
       const normalizedEmail = this.registerForm.value.email.toLowerCase().trim();
       // Extract username from email (part before @)
       const extractedUsername = normalizedEmail.split('@')[0];
       const userData = {
         username: extractedUsername, // Use name before @ as username
         email: normalizedEmail,
+=======
+      const userData = {
+        username: this.registerForm.value.email, // Use email as username
+        email: this.registerForm.value.email,
+        full_name: this.registerForm.value.full_name,
+>>>>>>> a7a8f08 (feat: home component)
         password: this.registerForm.value.password,
         confirm_password: this.registerForm.value.confirm_password
       };
@@ -152,6 +167,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (response) => {
             console.log('Registration response:', response);
+<<<<<<< HEAD
             
             // Check if this is email verification flow or direct login
             if (response.message && response.message.includes('verify your email')) {
@@ -161,15 +177,34 @@ export class RegisterComponent implements OnInit, OnDestroy {
             } else {
               this.successMessage = 'Registration successful! Please log in with your credentials.';
             }
+=======
+            this.successMessage = 'Registration successful! Please log in with your credentials.';
+>>>>>>> a7a8f08 (feat: home component)
             
             // Navigate to login page after successful registration
             setTimeout(() => {
               this.router.navigate(['/auth/login']);
+<<<<<<< HEAD
             }, 3000); // Extended time to read verification message
           },
           error: (error) => {
             console.error('Registration error:', error);
             this.errorMessage = this.getRegistrationErrorMessage(error);
+=======
+            }, 2000);
+          },
+          error: (error) => {
+            console.error('Registration error:', error);
+            if (error.error?.message) {
+              this.errorMessage = error.error.message;
+            } else if (error.error?.username) {
+              this.errorMessage = 'Username is already taken.';
+            } else if (error.error?.email) {
+              this.errorMessage = 'Email is already registered.';
+            } else {
+              this.errorMessage = 'Registration failed. Please try again.';
+            }
+>>>>>>> a7a8f08 (feat: home component)
           }
         });
     } else {
@@ -222,11 +257,16 @@ export class RegisterComponent implements OnInit, OnDestroy {
     const displayNames: Record<string, string> = {
       username: 'Username',
       email: 'Email',
+<<<<<<< HEAD
+=======
+      full_name: 'Full name',
+>>>>>>> a7a8f08 (feat: home component)
       password: 'Password',
       confirm_password: 'Confirm password'
     };
     return displayNames[fieldName] || fieldName;
   }
+<<<<<<< HEAD
 
   private getRegistrationErrorMessage(error: any): string {
     // Check for network errors first
@@ -339,4 +379,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
         return 'Registration failed. Please check your information and try again.';
     }
   }
+=======
+>>>>>>> a7a8f08 (feat: home component)
 }

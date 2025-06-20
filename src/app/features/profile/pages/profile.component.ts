@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+<<<<<<< HEAD
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { ImageUploadService } from '../../../core/services/image-upload.service';
@@ -67,6 +68,17 @@ export function noSpacesValidator(): ValidatorFn {
 @Component({
   selector: 'app-profile',
   imports: [CommonModule, ReactiveFormsModule, FooterComponent, InterestsComponent],
+=======
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { AuthService } from '../../../core/services/auth.service';
+import { takeUntil, Subject } from 'rxjs';
+import { User } from './../../../shared/interfaces/user.interface'
+import { FooterComponent } from '../../../shared/components/footer/footer.component';
+
+@Component({
+  selector: 'app-profile',
+  imports: [CommonModule, ReactiveFormsModule, FooterComponent],
+>>>>>>> a7a8f08 (feat: home component)
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
@@ -83,6 +95,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   showCurrentPassword = false;
   showNewPassword = false;
   showConfirmPassword = false;
+<<<<<<< HEAD
   newPasswordStrength = 0;
   activeTab: 'profile' | 'password' | 'interests' = 'profile';
   
@@ -91,11 +104,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
   uploadSuccessMessage = '';
   uploadErrorMessage = '';
   
+=======
+  activeTab: 'profile' | 'password' = 'profile';
+>>>>>>> a7a8f08 (feat: home component)
   private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+<<<<<<< HEAD
     private router: Router,
     private imageUploadService: ImageUploadService,
     private profilePictureService: ProfilePictureService
@@ -103,10 +120,20 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.profileForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       username: ['', [Validators.required, Validators.minLength(2), noSpacesValidator()]]
+=======
+    private router: Router
+  ) {
+    this.profileForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      full_name: ['', [Validators.required, Validators.minLength(2)]],
+      bio: [''],
+      profile_image: ['']
+>>>>>>> a7a8f08 (feat: home component)
     });
 
     this.passwordForm = this.fb.group({
       current_password: ['', [Validators.required]],
+<<<<<<< HEAD
       new_password: ['', [Validators.required, Validators.minLength(8), passwordStrengthValidator()]],
       confirm_password: ['', [Validators.required, passwordMatchValidator('new_password')]]
     });
@@ -116,6 +143,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
       this.calculatePasswordStrength(password);
       // Revalidate confirm password when password changes
       this.passwordForm.get('confirm_password')?.updateValueAndValidity();
+=======
+      new_password: ['', [Validators.required, Validators.minLength(8)]],
+      confirm_password: ['', [Validators.required]]
+>>>>>>> a7a8f08 (feat: home component)
     });
   }
 
@@ -128,7 +159,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
         if (user) {
           this.profileForm.patchValue({
             email: user.email,
+<<<<<<< HEAD
             username: user.username
+=======
+            full_name: user.full_name || '',
+            bio: user.bio || '',
+            profile_image: user.profile_image || ''
+>>>>>>> a7a8f08 (feat: home component)
           });
         }
       });
@@ -150,6 +187,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (this.profileForm.valid) {
       this.successMessage = '';
       this.errorMessage = '';
+<<<<<<< HEAD
       this.isLoading = true;
 
       const newUsername = this.profileForm.value.username;
@@ -176,6 +214,28 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         setTimeout(() => this.errorMessage = '', 3000);
       }
+=======
+
+      const profileData = {
+        username: this.profileForm.value.email, // Use email as username
+        email: this.profileForm.value.email,
+        full_name: this.profileForm.value.full_name,
+        bio: this.profileForm.value.bio,
+        profile_image: this.profileForm.value.profile_image
+      };
+
+      this.authService.updateProfile(profileData)
+        .subscribe({
+          next: (user) => {
+            this.successMessage = 'Profile updated successfully!';
+            setTimeout(() => this.successMessage = '', 5000);
+          },
+          error: (error) => {
+            console.error('Profile update error:', error);
+            this.errorMessage = error.error?.message || 'Failed to update profile. Please try again.';
+          }
+        });
+>>>>>>> a7a8f08 (feat: home component)
     } else {
       Object.keys(this.profileForm.controls).forEach(key => {
         this.profileForm.get(key)?.markAsTouched();
@@ -201,9 +261,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
             this.isPasswordLoading = false;
             setTimeout(() => this.passwordSuccessMessage = '', 5000);
           },
+<<<<<<< HEAD
           error: (error: any) => {
             console.error('Password change error:', error);
             this.passwordErrorMessage = this.getPasswordChangeErrorMessage(error);
+=======
+          error: (error) => {
+            console.error('Password change error:', error);
+            this.passwordErrorMessage = error.error?.message || 'Failed to change password. Please try again.';
+>>>>>>> a7a8f08 (feat: home component)
             this.isPasswordLoading = false;
           }
         });
@@ -220,6 +286,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return newPassword === confirmPassword;
   }
 
+<<<<<<< HEAD
   private calculatePasswordStrength(password: string): void {
     if (!password) {
       this.newPasswordStrength = 0;
@@ -259,6 +326,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return 'bg-green-500';
   }
 
+=======
+>>>>>>> a7a8f08 (feat: home component)
   togglePasswordVisibility(field: 'current' | 'new' | 'confirm'): void {
     switch (field) {
       case 'current':
@@ -273,15 +342,22 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
   }
 
+<<<<<<< HEAD
   setActiveTab(tab: 'profile' | 'password' | 'interests'): void {
+=======
+  setActiveTab(tab: 'profile' | 'password'): void {
+>>>>>>> a7a8f08 (feat: home component)
     this.activeTab = tab;
     // Clear messages when switching tabs
     this.successMessage = '';
     this.errorMessage = '';
     this.passwordSuccessMessage = '';
     this.passwordErrorMessage = '';
+<<<<<<< HEAD
     this.uploadSuccessMessage = '';
     this.uploadErrorMessage = '';
+=======
+>>>>>>> a7a8f08 (feat: home component)
   }
 
   getFieldError(form: FormGroup, fieldName: string): string {
@@ -296,6 +372,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       if (field.errors['minlength']) {
         return `${this.getFieldDisplayName(fieldName)} must be at least ${field.errors['minlength'].requiredLength} characters`;
       }
+<<<<<<< HEAD
       if (field.errors['passwordStrength']) {
         return 'Password must contain uppercase, lowercase, number, and special character';
       }
@@ -305,6 +382,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
       if (field.errors['noSpaces']) {
         return 'Username cannot contain spaces';
       }
+=======
+>>>>>>> a7a8f08 (feat: home component)
     }
     return '';
   }
@@ -317,7 +396,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private getFieldDisplayName(fieldName: string): string {
     const displayNames: Record<string, string> = {
       email: 'Email',
+<<<<<<< HEAD
       username: 'Username',
+=======
+      full_name: 'Full name',
+      bio: 'Bio',
+>>>>>>> a7a8f08 (feat: home component)
       current_password: 'Current password',
       new_password: 'New password',
       confirm_password: 'Confirm password'
@@ -326,7 +410,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   getUserInitials(): string {
+<<<<<<< HEAD
     return this.profilePictureService.getUserInitials(this.currentUser);
+=======
+    if (!this.currentUser) return '';
+    const name = this.currentUser.full_name || this.currentUser.username;
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+>>>>>>> a7a8f08 (feat: home component)
   }
 
   getProviderIcon(): string {
@@ -340,6 +430,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   navigateToHome(): void {
     this.router.navigate(['/home']);
   }
+<<<<<<< HEAD
 
 
   // Profile picture upload functionality
@@ -692,4 +783,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
         return 'Failed to remove profile picture. Please try again.';
     }
   }
+=======
+>>>>>>> a7a8f08 (feat: home component)
 }
