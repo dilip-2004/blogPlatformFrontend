@@ -109,14 +109,7 @@
       }
       @if (visible === 'chartjs') {
         <div class="chart-wrapper chartjs-wrapper">
-          <div class="coming-soon">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" class="coming-soon-icon">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
-              <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <h3>Chart.js Integration</h3>
-            <p>Coming soon! We're working on bringing you beautiful Chart.js visualizations.</p>
-          </div>
+          <app-chartjs></app-chartjs>
         </div>
       }
       @if (visible === 'highchart') {

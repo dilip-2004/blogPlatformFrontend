@@ -4,91 +4,77 @@ import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Chart, registerables } from 'chart.js';
-
-import {
-  DashboardService,
-  DashboardTotals,
-  PostsOverTime,
-  PostsByCategory,
-  MostLikedPost,
-  MostCommentedPost
-} from '../../../../core/services/dashboard.service';
+import { DashboardService } from '../../../../core/services/dashboard.service';
+import { mostLiked, postsByCategory, postsOverTime, topTags, Total, usersOverTime } from '../../../../shared/interfaces/dashboard.interface';
 
 // Register Chart.js components
 Chart.register(...registerables);
 
 @Component({
-  selector: 'app-chartjs-dashboard',
+  selector: 'app-chartjs',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './chartjs.component.html',
   styleUrls: ['./chartjs.component.css']
 })
-export class ChartjsDashboardComponent implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild('pieChart', { static: false }) pieChartRef!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('lineChart', { static: false }) lineChartRef!: ElementRef<HTMLCanvasElement>;
+export class ChartjsComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('postsChart', { static: false }) postsChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('usersChart', { static: false }) usersChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('likesChart', { static: false }) likesChartRef!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('commentsChart', { static: false }) commentsChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('tagsChart', { static: false }) tagsChartRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('categoryChart', { static: false }) categoryChartRef!: ElementRef<HTMLCanvasElement>;
 
   private destroy$ = new Subject<void>();
-  private pieChart: Chart | null = null;
-  private lineChart: Chart | null = null;
+  private postsChart: Chart | null = null;
+  private usersChart: Chart | null = null;
   private likesChart: Chart | null = null;
-  private commentsChart: Chart | null = null;
+  private tagsChart: Chart | null = null;
+  private categoryChart: Chart | null = null;
 
-  // Data properties
-  totals: DashboardTotals | null = null;
-  postsOverTime: PostsOverTime[] = [];
-  postsByCategory: PostsByCategory[] = [];
-  mostLikedPosts: MostLikedPost[] = [];
-  mostCommentedPosts: MostCommentedPost[] = [];
-
-  // UI state
-  isLoading = true;
-  hasError = false;
-  
-  // Filters
-  selectedTimePeriod = 'week';
-  selectedCategory = '';
-
-  // Available options
-  timePeriods = [
-    { value: 'day', label: 'Daily' },
-    { value: 'week', label: 'Weekly' },
-    { value: 'month', label: 'Monthly' },
-    { value: 'year', label: 'Yearly' }
-  ];
-
-  categories: string[] = [];
+  selectedRange = 'all';
+  totals: Total = {
+    total_posts: 0,
+    total_users: 0,
+    total_likes: 0,
+    total_comments: 0
+  };
 
   constructor(
     private dashboardService: DashboardService
   ) {}
 
   ngOnInit(): void {
-    this.loadDashboardData();
+    this.loadAllCharts(this.selectedRange);
   }
 
   ngAfterViewInit(): void {
     // Charts will be initialized when data is loaded
   }
 
-  private initializeCharts(): void {
-    // Use setTimeout to ensure DOM is ready
-    setTimeout(() => {
-      if (this.postsByCategory.length > 0 && this.pieChartRef?.nativeElement) {
-        this.updatePieChart();
-      }
-      if (this.postsOverTime.length > 0 && this.lineChartRef?.nativeElement) {
-        this.updateLineChart();
-      }
-      if (this.mostLikedPosts.length > 0 && this.likesChartRef?.nativeElement) {
-        this.updateLikesChart();
-      }
-      if (this.mostCommentedPosts.length > 0 && this.commentsChartRef?.nativeElement) {
-        this.updateCommentsChart();
-      }
-    }, 200);
+  loadAllCharts(range: string) {
+    this.dashboardService.getTotals().subscribe(data => {
+      this.totals = data;
+    });
+
+    this.dashboardService.getPostsOverTime(range).subscribe(data => {
+      this.renderPostChart('postsChart', data, 'Posts Over Time');
+    });
+
+    this.dashboardService.getUsersOverTime(range).subscribe(data => {
+      this.renderUserChart('usersChart', data, 'Users Over Time');
+    });
+
+    this.dashboardService.getTopTags().subscribe(data => {
+      this.renderTopTagsChart('tagsChart', data, 'Top Tags');
+    });
+
+    this.dashboardService.getPostsByCategory().subscribe(data => {
+      this.renderPostByCategoryChart('categoryChart', data, 'Posts by Category');
+    });
+
+    this.dashboardService.getMostLiked().subscribe(data => {
+      this.renderMostLikesChart('likesChart', data, 'Most Liked Posts');
+    });
   }
 
   ngOnDestroy(): void {
@@ -98,269 +84,266 @@ export class ChartjsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   private destroyCharts(): void {
-    [this.pieChart, this.lineChart, this.likesChart, this.commentsChart].forEach(chart => {
+    [this.postsChart, this.usersChart, this.likesChart, this.tagsChart, this.categoryChart].forEach(chart => {
       if (chart) {
         chart.destroy();
       }
     });
   }
 
-  loadDashboardData(): void {
-    this.isLoading = true;
-    this.hasError = false;
-    let completedRequests = 0;
-    const totalRequests = 5;
+  renderPostChart(elementId: string, data: postsOverTime, title: string) {
+    setTimeout(() => {
+      const canvas = document.getElementById(elementId) as HTMLCanvasElement;
+      if (!canvas) return;
 
-    const handleError = (error: any, context: string) => {
-      console.error(`Error loading ${context}:`, error);
-      completedRequests++;
-      if (completedRequests === totalRequests) {
-        this.isLoading = false;
-        this.hasError = true;
+      if (this.postsChart) {
+        this.postsChart.destroy();
       }
-    };
 
-    const handleSuccess = () => {
-      completedRequests++;
-      if (completedRequests === totalRequests) {
-        this.isLoading = false;
-        this.hasError = false;
-        // Initialize charts after all data is loaded
-        this.initializeCharts();
-      }
-    };
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-    // Load dashboard data
-    this.dashboardService.getTotals()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (data) => {
-          this.totals = data;
-          handleSuccess();
+      this.postsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Posts',
+            data: data.counts,
+            borderColor: '#F8AE54',
+            backgroundColor: 'rgba(248, 174, 84, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4
+          }]
         },
-        error: (error) => handleError(error, 'totals')
-      });
-
-    this.dashboardService.getPostsOverTime(this.selectedTimePeriod as any)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (data) => {
-          this.postsOverTime = data;
-          handleSuccess();
-        },
-        error: (error) => handleError(error, 'posts over time')
-      });
-
-    this.dashboardService.getPostsByCategory()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (data) => {
-          this.postsByCategory = data;
-          this.categories = data.map(item => item.category);
-          handleSuccess();
-        },
-        error: (error) => handleError(error, 'posts by category')
-      });
-
-    this.dashboardService.getMostLikedPosts()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (data) => {
-          this.mostLikedPosts = data;
-          handleSuccess();
-        },
-        error: (error) => handleError(error, 'most liked posts')
-      });
-
-    this.dashboardService.getMostCommentedPosts()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (data) => {
-          this.mostCommentedPosts = data;
-          handleSuccess();
-        },
-        error: (error) => handleError(error, 'most commented posts')
-      });
-  }
-
-  onTimePeriodChange(): void {
-    this.dashboardService.getPostsOverTime(this.selectedTimePeriod as any)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (data) => {
-          this.postsOverTime = data;
-          // Wait a bit to ensure the chart container is ready
-          setTimeout(() => {
-            this.updateLineChart();
-          }, 100);
-        },
-        error: (error) => console.error('Error loading posts over time:', error)
-      });
-  }
-
-  updatePieChart(): void {
-    if (!this.pieChartRef?.nativeElement || this.postsByCategory.length === 0) return;
-
-    if (this.pieChart) {
-      this.pieChart.destroy();
-    }
-
-    const ctx = this.pieChartRef.nativeElement.getContext('2d');
-    if (!ctx) return;
-
-    this.pieChart = new Chart(ctx, {
-      type: 'pie',
-      data: {
-        labels: this.postsByCategory.map(item => item.category),
-        datasets: [{
-          data: this.postsByCategory.map(item => item.count),
-          backgroundColor: [
-            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-            '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
-          ],
-          borderWidth: 2,
-          borderColor: '#fff'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom'
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: title,
+              font: {
+                size: 16
+              }
+            },
+            legend: {
+              display: false
+            }
           },
-          title: {
-            display: true,
-            text: 'Posts by Category'
+          scales: {
+            x: {
+              ticks: {
+                maxRotation: 45
+              }
+            },
+            y: {
+              beginAtZero: true
+            }
           }
         }
-      }
-    });
+      });
+    }, 200);
   }
 
-  updateLineChart(): void {
-    if (!this.lineChartRef?.nativeElement || this.postsOverTime.length === 0) return;
+  renderUserChart(elementId: string, data: usersOverTime, title: string) {
+    setTimeout(() => {
+      const canvas = document.getElementById(elementId) as HTMLCanvasElement;
+      if (!canvas) return;
 
-    if (this.lineChart) {
-      this.lineChart.destroy();
-    }
+      if (this.usersChart) {
+        this.usersChart.destroy();
+      }
 
-    const ctx = this.lineChartRef.nativeElement.getContext('2d');
-    if (!ctx) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-    this.lineChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: this.postsOverTime.map(item => item.period),
-        datasets: [{
-          label: 'Posts Published',
-          data: this.postsOverTime.map(item => item.count),
-          borderColor: '#36A2EB',
-          backgroundColor: 'rgba(54, 162, 235, 0.1)',
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          title: {
-            display: true,
-            text: `Posts Published Over Time (${this.selectedTimePeriod})`
-          }
+      this.usersChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Users',
+            data: data.counts,
+            backgroundColor: '#37A3A3',
+            borderColor: '#37A3A3',
+            borderWidth: 1
+          }]
         },
-        scales: {
-          y: {
-            beginAtZero: true
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: title
+            },
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                maxRotation: 45
+              }
+            },
+            y: {
+              beginAtZero: true
+            }
           }
         }
-      }
-    });
+      });
+    }, 200);
   }
 
-  updateLikesChart(): void {
-    if (!this.likesChartRef?.nativeElement || this.mostLikedPosts.length === 0) return;
+  renderMostLikesChart(elementId: string, data: mostLiked[], title: string): void {
+    setTimeout(() => {
+      const canvas = document.getElementById(elementId) as HTMLCanvasElement;
+      if (!canvas) return;
 
-    if (this.likesChart) {
-      this.likesChart.destroy();
-    }
+      if (this.likesChart) {
+        this.likesChart.destroy();
+      }
 
-    const ctx = this.likesChartRef.nativeElement.getContext('2d');
-    if (!ctx) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-    this.likesChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: this.mostLikedPosts.map(post => post.title.substring(0, 20) + '...'),
-        datasets: [{
-          label: 'Likes',
-          data: this.mostLikedPosts.map(post => post.likes_count),
-          backgroundColor: '#FF6384',
-          borderColor: '#FF6384',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          title: {
-            display: true,
-            text: 'Most Liked Posts'
-          }
+      this.likesChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: data.map(item => item.title),
+          datasets: [{
+            data: data.map(item => item.likes),
+            backgroundColor: [
+              '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+              '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
         },
-        scales: {
-          y: {
-            beginAtZero: true
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: title
+            },
+            legend: {
+              display: false
+            }
           }
         }
-      }
-    });
+      });
+    }, 200);
   }
 
-  updateCommentsChart(): void {
-    if (!this.commentsChartRef?.nativeElement || this.mostCommentedPosts.length === 0) return;
+  renderTopTagsChart(elementId: string, data: topTags[], title: string) {
+    setTimeout(() => {
+      const canvas = document.getElementById(elementId) as HTMLCanvasElement;
+      if (!canvas) return;
 
-    if (this.commentsChart) {
-      this.commentsChart.destroy();
-    }
+      if (this.tagsChart) {
+        this.tagsChart.destroy();
+      }
 
-    const ctx = this.commentsChartRef.nativeElement.getContext('2d');
-    if (!ctx) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-    this.commentsChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: this.mostCommentedPosts.map(post => post.title.substring(0, 20) + '...'),
-        datasets: [{
-          label: 'Comments',
-          data: this.mostCommentedPosts.map(post => post.comment_count),
-          backgroundColor: '#FFCE56',
-          borderColor: '#FFCE56',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          title: {
-            display: true,
-            text: 'Most Commented Posts'
-          }
+      this.tagsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.map(tag => tag.name),
+          datasets: [{
+            label: 'Tag Usage',
+            data: data.map(tag => tag.value),
+            borderColor: '#9966FF',
+            backgroundColor: 'rgba(153, 102, 255, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.3
+          }]
         },
-        scales: {
-          x: {
-            beginAtZero: true
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: title
+            },
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
           }
         }
-      }
-    });
+      });
+    }, 200);
   }
 
-  refreshData(): void {
-    this.loadDashboardData();
+  renderPostByCategoryChart(elementId: string, data: postsByCategory[], title: string): void {
+    setTimeout(() => {
+      const canvas = document.getElementById(elementId) as HTMLCanvasElement;
+      if (!canvas) return;
+
+      if (this.categoryChart) {
+        this.categoryChart.destroy();
+      }
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      this.categoryChart = new Chart(ctx, {
+        type: 'polarArea',
+        data: {
+          labels: data.map(d => d.name),
+          datasets: [{
+            data: data.map(d => d.count),
+            backgroundColor: [
+              '#DCA614', '#FF6384', '#36A2EB', '#FFCE56',
+              '#4BC0C0', '#9966FF', '#FF9F40'
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: title
+            },
+            legend: {
+              position: 'bottom',
+              labels: {
+                font: {
+                  size: 8
+                }
+              }
+            }
+          },
+          scales: {
+            r: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }, 200);
+  }
+
+  onRangeChange(event: Event) {
+    const selected = (event.target as HTMLSelectElement).value;
+    this.loadAllCharts(selected);
   }
 }

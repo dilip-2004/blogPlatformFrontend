@@ -1,84 +1,68 @@
-<div class="dashboard-container">
+<div class="dashboard-wrapper">
+  <!-- Filter Header -->
   <div class="dashboard-header">
-    <h1>Platform Analytics Dashboard</h1>
-    <div class="actions">
-      <button (click)="refreshData()" class="refresh-btn">
-        Refresh Data
-      </button>
+    <div class="flex">
+      <div>
+        <h2>Chart.js Dashboard</h2>
+        <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">Interactive analytics with Chart.js library</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <label style="font-weight: 500; opacity: 0.9;">Time Range:</label>
+        <select (change)="onRangeChange($event)">
+          <option value="7d">Last 7 Days</option>
+          <option value="6m">Last 6 Months</option>
+          <option value="1y">Last 1 Year</option>
+          <option value="all" selected>All Time</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-cards-grid">
+    <div class="stat-card">
+      <span class="stat-value">{{ totals.total_posts }}</span>
+      <span class="stat-label">Total Posts</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ totals.total_users }}</span>
+      <span class="stat-label">Total Users</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ totals.total_comments }}</span>
+      <span class="stat-label">Total Comments</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ totals.total_likes }}</span>
+      <span class="stat-label">Total Likes</span>
     </div>
   </div>
 
-  <div *ngIf="isLoading" class="loading-container">
-    <div class="spinner"></div>
-    <p>Loading dashboard data...</p>
-  </div>
-
-  <div *ngIf="hasError" class="error-container">
-    <p>There was an error loading the dashboard data. Please try again later.</p>
-    <button (click)="refreshData()" class="refresh-btn">Try Again</button>
-  </div>
-
-  <div *ngIf="!isLoading && !hasError" class="dashboard-content">
-    <!-- Summary Cards -->
-    <div class="stats-cards">
-      <div class="stat-card" *ngIf="totals">
-        <h3>Users</h3>
-        <p class="stat-value">{{ totals.total_users }}</p>
-      </div>
-      <div class="stat-card" *ngIf="totals">
-        <h3>Posts</h3>
-        <p class="stat-value">{{ totals.total_posts }}</p>
-      </div>
-      <div class="stat-card" *ngIf="totals">
-        <h3>Comments</h3>
-        <p class="stat-value">{{ totals.total_comments }}</p>
-      </div>
-      <div class="stat-card" *ngIf="totals">
-        <h3>Likes</h3>
-        <p class="stat-value">{{ totals.total_likes }}</p>
-      </div>
-    </div>
-
-    <!-- Line Chart -->
+  <!-- Charts Grid -->
+  <div class="charts-grid">
     <div class="chart-container">
-      <div class="chart-header">
-        <h2>Posts Over Time</h2>
-        <div class="filter">
-          <label for="timePeriod">Time Period:</label>
-          <select id="timePeriod" [(ngModel)]="selectedTimePeriod" (change)="onTimePeriodChange()">
-            <option *ngFor="let period of timePeriods" [value]="period.value">{{ period.label }}</option>
-          </select>
-        </div>
-      </div>
       <div class="chart-wrapper">
-        <canvas #lineChart></canvas>
+        <canvas id="postsChart"></canvas>
       </div>
     </div>
-
-    <!-- Two Column Layout -->
-    <div class="chart-grid">
-      <!-- Pie Chart -->
-      <div class="chart-container">
-        <h2>Posts by Category</h2>
-        <div class="chart-wrapper">
-          <canvas #pieChart></canvas>
-        </div>
+    <div class="chart-container">
+      <div class="chart-wrapper">
+        <canvas id="usersChart"></canvas>
       </div>
-
-      <!-- Bar Chart - Likes -->
-      <div class="chart-container">
-        <h2>Most Liked Posts</h2>
-        <div class="chart-wrapper">
-          <canvas #likesChart></canvas>
-        </div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-wrapper">
+        <canvas id="likesChart"></canvas>
       </div>
-
-      <!-- Bar Chart - Comments -->
-      <div class="chart-container">
-        <h2>Most Commented Posts</h2>
-        <div class="chart-wrapper">
-          <canvas #commentsChart></canvas>
-        </div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-wrapper">
+        <canvas id="tagsChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-container">
+      <div class="chart-wrapper">
+        <canvas id="categoryChart"></canvas>
       </div>
     </div>
   </div>
