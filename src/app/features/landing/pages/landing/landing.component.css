@@ -1,0 +1,638 @@
+/* Minimal Dark Landing Page - Medium Inspired */
+
+/* Main Landing Container */
+.landing-hero {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-container {
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+/* Brand Section */
+.brand-section {
+  margin-bottom: 4rem;
+  animation: fadeInUp 1s ease-out;
+}
+
+.brand-logo {
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  animation: fadeInScale 1.2s ease-out 0.2s forwards;
+}
+
+.brand-title {
+  font-size: 2.5rem;
+  font-weight: 300;
+  color: #ffffff;
+  margin: 0 0 0.75rem 0;
+  letter-spacing: -0.02em;
+  font-family: 'Inter', sans-serif;
+  opacity: 0;
+  animation: fadeInUp 1s ease-out 0.4s forwards;
+}
+
+.brand-subtitle {
+  font-size: 1.125rem;
+  color: #9ca3af;
+  margin: 0;
+  font-weight: 400;
+  opacity: 0;
+  animation: fadeInUp 1s ease-out 0.6s forwards;
+}
+
+/* Login Section */
+.login-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  opacity: 0;
+  animation: fadeInUp 1s ease-out 0.8s forwards;
+}
+
+.stats-button {
+  cursor: pointer;
+}
+
+.login-button, .stats-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+.login-button::before, .stats-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.login-button:hover::before, .stats-button:hover::before {
+  opacity: 1;
+}
+
+.login-button:hover, .stats-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.login-text,
+.login-arrow
+, .stats-text,.stats-arrow {
+  position: relative;
+  z-index: 1;
+}
+
+.login-arrow, .stats-arrow {
+  transition: transform 0.3s ease;
+}
+
+.login-button:hover .login-arrow,.stats-button:hover,.stats-arrow {
+  transform: translateX(4px);
+}
+
+/* Auth Links */
+.auth-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.auth-divider {
+  color: #6b7280;
+}
+
+.register-link {
+  color: #9ca3af;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.register-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transition: width 0.3s ease;
+}
+
+.register-link:hover {
+  color: #ffffff;
+}
+
+.register-link:hover::after {
+  width: 100%;
+}
+
+/* Decorative Elements */
+.decoration-dots {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: float 6s ease-in-out infinite;
+}
+
+.dot-1 {
+  top: 15%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.dot-2 {
+  top: 25%;
+  right: 15%;
+  animation-delay: 1s;
+}
+
+.dot-3 {
+  top: 60%;
+  left: 8%;
+  animation-delay: 2s;
+}
+
+.dot-4 {
+  bottom: 20%;
+  right: 12%;
+  animation-delay: 3s;
+}
+
+.dot-5 {
+  top: 40%;
+  left: 50%;
+  animation-delay: 4s;
+  opacity: 0.1;
+}
+
+.dot-6 {
+  bottom: 35%;
+  left: 20%;
+  animation-delay: 5s;
+  opacity: 0.2;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-10px) rotate(120deg);
+  }
+  66% {
+    transform: translateY(5px) rotate(240deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .landing-hero {
+    padding: 1rem;
+    min-height: 100vh;
+    /* Ensure full height on mobile */
+  }
+  
+  .landing-container {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .brand-title {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+  
+  .brand-subtitle {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .login-button {
+    padding: 0.875rem 1.75rem;
+    font-size: 0.9rem;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  
+  .auth-links {
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .landing-hero {
+    padding: 0.75rem;
+  }
+  
+  .brand-title {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .brand-title {
+    font-size: 1.75rem;
+  }
+  
+  .auth-links {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Stats Dashboard Section */
+.stats-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+  padding: 4rem 2rem;
+  position: relative;
+}
+
+.stats-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  opacity: 0;
+  animation: fadeInUp 1s ease-out 0.2s forwards;
+}
+
+.dashboard-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 1rem 0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: 'Inter', sans-serif;
+}
+
+.dashboard-subtitle {
+  font-size: 1.25rem;
+  color: #64748b;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Chart Selector */
+.chart-selector {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 3rem;
+  opacity: 0;
+  animation: fadeInUp 1s ease-out 0.4s forwards;
+}
+
+.selector-container {
+  display: flex;
+  gap: 1rem;
+  background: white;
+  padding: 0.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.chart-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 0.75rem;
+}
+
+.chart-btn.active {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.chart-btn:hover:not(.active) {
+  background: #f8fafc;
+  color: #1e293b;
+  transform: translateY(-1px);
+}
+
+.chart-icon {
+  position: relative;
+  z-index: 1;
+}
+
+.chart-btn span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Chart Display Area */
+.chart-display {
+  opacity: 0;
+  animation: fadeInUp 1s ease-out 0.6s forwards;
+}
+
+.chart-wrapper {
+  background: white;
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.chart-wrapper:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+}
+
+/* ECharts specific styling */
+.echarts-wrapper {
+  padding: 1.5rem;
+}
+
+/* HighCharts specific styling */
+.highcharts-wrapper {
+  padding: 1rem;
+}
+
+/* Coming Soon placeholder */
+.coming-soon {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #64748b;
+}
+
+.coming-soon-icon {
+  margin-bottom: 1.5rem;
+  color: #94a3b8;
+}
+
+.coming-soon h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 1rem 0;
+}
+
+.coming-soon p {
+  font-size: 1rem;
+  margin: 0;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .landing-hero {
+    background: #000000;
+  }
+  
+  .brand-title {
+    color: #ffffff;
+  }
+  
+  .login-button {
+    background: #ffffff;
+    color: #000000;
+  }
+  
+  .stats-dashboard {
+    background: #ffffff;
+  }
+  
+  .dashboard-title {
+    color: #000000;
+    -webkit-text-fill-color: #000000;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .brand-logo,
+  .brand-title,
+  .brand-subtitle,
+  .login-section,
+  .dashboard-header,
+  .chart-selector,
+  .chart-display {
+    animation: none;
+    opacity: 1;
+  }
+  
+  .dot {
+    animation: none;
+  }
+  
+  .login-button,
+  .chart-btn,
+  .chart-wrapper {
+    transition: none;
+  }
+}
+
+/* Responsive Design for Stats Dashboard */
+@media (max-width: 1024px) {
+  .stats-dashboard {
+    padding: 3rem 1.5rem;
+  }
+  
+  .dashboard-title {
+    font-size: 2.5rem;
+  }
+  
+  .selector-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .chart-btn {
+    width: 200px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-dashboard {
+    padding: 2rem 1rem;
+  }
+  
+  .dashboard-title {
+    font-size: 2rem;
+  }
+  
+  .dashboard-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .selector-container {
+    padding: 0.25rem;
+    border-radius: 0.75rem;
+  }
+  
+  .chart-btn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+    width: 180px;
+  }
+  
+  .chart-wrapper {
+    border-radius: 1rem;
+  }
+  
+  .echarts-wrapper {
+    padding: 1rem;
+  }
+  
+  .coming-soon {
+    padding: 3rem 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-header {
+    margin-bottom: 2rem;
+  }
+  
+  .dashboard-title {
+    font-size: 1.75rem;
+  }
+  
+  .dashboard-subtitle {
+    font-size: 1rem;
+  }
+  
+  .chart-selector {
+    margin-bottom: 2rem;
+  }
+  
+  .chart-btn {
+    width: 160px;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .coming-soon {
+    padding: 2rem 1rem;
+  }
+  
+  .coming-soon h3 {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-dashboard {
+    padding: 1.5rem 0.75rem;
+  }
+  
+  .chart-btn {
+    width: 140px;
+    gap: 0.25rem;
+  }
+  
+  .chart-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
