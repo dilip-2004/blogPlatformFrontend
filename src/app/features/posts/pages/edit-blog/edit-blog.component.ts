@@ -8,11 +8,7 @@ import { BlogService } from '../../../../core/services/blog.service';
 import { ImageUploadService } from '../../../../core/services/image-upload.service';
 import { Blog, UpdateBlogRequest, Tag } from '../../../../shared/interfaces/post.interface';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
-<<<<<<< HEAD
 import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
-import { normalizeTag, normalizeTags, areTagsEqual } from '../../../../shared/utils/tag.util';
-=======
->>>>>>> a7a8f08 (feat: home component)
 
 export interface BlogBlock {
   id: string;
@@ -24,11 +20,7 @@ export interface BlogBlock {
 @Component({
   selector: 'app-edit-blog',
   standalone: true,
-<<<<<<< HEAD
   imports: [CommonModule, FormsModule, FooterComponent, DateFormatPipe],
-=======
-  imports: [CommonModule, FormsModule, FooterComponent],
->>>>>>> a7a8f08 (feat: home component)
   templateUrl: './edit-blog.component.html',
   styleUrl: './edit-blog.component.css'
 })
@@ -52,10 +44,6 @@ export class EditBlogComponent implements OnInit, OnDestroy {
   showUnsavedChangesModal = false;
   pendingNavigation: string | null = null;
   isUploadingImage = false;
-<<<<<<< HEAD
-  private hoverTimeout: any = null;
-=======
->>>>>>> a7a8f08 (feat: home component)
   
   // Republish modal state
   showRepublishModal = false;
@@ -239,30 +227,6 @@ export class EditBlogComponent implements OnInit, OnDestroy {
 
   // Toggle add menu
   toggleAddMenu(blockId?: string): void {
-<<<<<<< HEAD
-    // Clear any pending close timeout
-    if (this.hoverTimeout) {
-      clearTimeout(this.hoverTimeout);
-      this.hoverTimeout = null;
-    }
-    
-    this.currentBlockId = blockId || null;
-    this.showAddMenu = true; // Always show on hover/click
-  }
-
-  // Close add menu with delay to prevent accidental closing
-  closeAddMenu(): void {
-    // Clear any existing timeout
-    if (this.hoverTimeout) {
-      clearTimeout(this.hoverTimeout);
-    }
-    
-    // Add a small delay before closing to prevent accidental closing
-    this.hoverTimeout = setTimeout(() => {
-      this.showAddMenu = false;
-      this.currentBlockId = null;
-    }, 200); // 200ms delay
-=======
     this.currentBlockId = blockId || null;
     this.showAddMenu = !this.showAddMenu;
   }
@@ -271,7 +235,6 @@ export class EditBlogComponent implements OnInit, OnDestroy {
   closeAddMenu(): void {
     this.showAddMenu = false;
     this.currentBlockId = null;
->>>>>>> a7a8f08 (feat: home component)
   }
 
   // Add new block
@@ -343,14 +306,11 @@ export class EditBlogComponent implements OnInit, OnDestroy {
   }
 
   saveChanges(): void {
-<<<<<<< HEAD
-=======
     if (!this.hasChanges) {
       this.showMessageContainer('No changes to save.', 'info');
       return;
     }
 
->>>>>>> a7a8f08 (feat: home component)
     if (!this.blogTitle.trim()) {
       this.showMessageContainer('Please enter a blog title', 'error');
       return;
@@ -361,28 +321,12 @@ export class EditBlogComponent implements OnInit, OnDestroy {
       return;
     }
 
-<<<<<<< HEAD
-    // Always allow opening republish modal to edit main image and tags
-=======
     // Open republish modal to edit main image and tags
->>>>>>> a7a8f08 (feat: home component)
     this.showRepublishModal = true;
   }
   
   // Perform the actual save operation
   performSave(): void {
-<<<<<<< HEAD
-    // Final change detection check before saving
-    this.checkForChanges();
-    
-    if (!this.hasChanges) {
-      this.showMessageContainer('No changes detected to save.', 'info');
-      this.showRepublishModal = false;
-      return;
-    }
-    
-=======
->>>>>>> a7a8f08 (feat: home component)
     this.saving = true;
     this.isRepublishing = true;
     
@@ -390,11 +334,7 @@ export class EditBlogComponent implements OnInit, OnDestroy {
       title: this.blogTitle,
       content: JSON.stringify(this.blogBlocks),
       main_image_url: this.mainImageUrl,
-<<<<<<< HEAD
-      tags: normalizeTags(this.selectedTags)
-=======
       tags: this.selectedTags  // Changed from tag_ids to tags
->>>>>>> a7a8f08 (feat: home component)
     };
 
     // Use blogService.updateBlog directly to ensure MongoDB update
@@ -478,19 +418,6 @@ export class EditBlogComponent implements OnInit, OnDestroy {
     return block.id;
   }
 
-<<<<<<< HEAD
-=======
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
->>>>>>> a7a8f08 (feat: home component)
 
   // S3 Image Upload Functionality
   
@@ -531,11 +458,7 @@ export class EditBlogComponent implements OnInit, OnDestroy {
         console.log('Full upload response:', response);
         if (response && response.imageUrl) {
           block.data = response.imageUrl;
-<<<<<<< HEAD
-          console.log('Image uploaded successfully:', response.imageUrl);
-=======
           console.log('Image uploaded to S3 successfully:', response.imageUrl);
->>>>>>> a7a8f08 (feat: home component)
           this.showMessageContainer('Image uploaded successfully!', 'success');
           this.isUploadingImage = false;
           this.checkForChanges(); // Mark as changed
@@ -668,11 +591,7 @@ export class EditBlogComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (response) => {
         this.mainImageUrl = response.imageUrl;
-<<<<<<< HEAD
-        console.log('Main image uploaded successfully:', response.imageUrl);
-=======
         console.log('Main image uploaded to S3:', response.imageUrl);
->>>>>>> a7a8f08 (feat: home component)
         this.showMessageContainer('Main image uploaded successfully!', 'success');
         this.isUploadingMainImage = false;
         this.checkForChanges();
@@ -709,12 +628,7 @@ export class EditBlogComponent implements OnInit, OnDestroy {
       return;
     }
     
-<<<<<<< HEAD
-    const norm = normalizeTag(tagName);
-    if (this.selectedTags.some(t => areTagsEqual(t, norm))) {
-=======
     if (this.selectedTags.includes(tagName)) {
->>>>>>> a7a8f08 (feat: home component)
       this.showMessageContainer('Tag already added', 'error');
       return;
     }
@@ -724,11 +638,7 @@ export class EditBlogComponent implements OnInit, OnDestroy {
       return;
     }
     
-<<<<<<< HEAD
-    this.selectedTags.push(norm);
-=======
     this.selectedTags.push(tagName);
->>>>>>> a7a8f08 (feat: home component)
     this.newTagInput = '';
     this.checkForChanges();
   }
@@ -744,21 +654,12 @@ export class EditBlogComponent implements OnInit, OnDestroy {
 
   // Add tag from recommended list
   addRecommendedTag(tagName: string): void {
-<<<<<<< HEAD
-    const norm = normalizeTag(tagName);
-    if (!this.selectedTags.some(t => areTagsEqual(t, norm))) {
-=======
     if (!this.selectedTags.includes(tagName)) {
->>>>>>> a7a8f08 (feat: home component)
       if (this.selectedTags.length >= 10) {
         this.showMessageContainer('Maximum 10 tags allowed', 'error');
         return;
       }
-<<<<<<< HEAD
-      this.selectedTags.push(norm);
-=======
       this.selectedTags.push(tagName);
->>>>>>> a7a8f08 (feat: home component)
       this.checkForChanges();
     }
   }

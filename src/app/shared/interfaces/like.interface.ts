@@ -13,4 +13,3 @@ export interface LikeResponse {
   created_at?: string;
   message?: string;
 }
-

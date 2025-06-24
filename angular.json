@@ -66,13 +66,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-<<<<<<< HEAD
                   "maximumWarning": "50kB",
                   "maximumError": "30kB"
-=======
-                  "maximumWarning": "10kB",
-                  "maximumError": "15kB"
->>>>>>> a7a8f08 (feat: home component)
                 }
               ],
               "outputHashing": "all"

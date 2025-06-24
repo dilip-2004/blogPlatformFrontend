@@ -2,25 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { BlogService } from './blog.service';
-import { Blog, UpdateBlogRequest, BlogSummary } from '../../shared/interfaces/post.interface';
-
-interface BlogState {
-  blogs: Blog[];
-  loading: boolean;
-  error: string | null;
-  selectedBlog: Blog | null;
-  hasChanges: boolean;
-  originalContent: string | null;
-}
-
-const initialState: BlogState = {
-  blogs: [],
-  loading: false,
-  error: null,
-  selectedBlog: null,
-  hasChanges: false,
-  originalContent: null
-};
+import { Blog, UpdateBlogRequest } from '../../shared/interfaces/post.interface';
+import { BlogState,initialState } from '../../shared/interfaces/blog'
 
 @Injectable({
   providedIn: 'root'
@@ -294,10 +277,7 @@ export class BlogStateService {
       _id: localBlog._id,
       user_id: localBlog.user_id || 'current_user',
       title: localBlog.title,
-<<<<<<< HEAD
       username:localBlog.username,
-=======
->>>>>>> a7a8f08 (feat: home component)
       content: localBlog.content,
       tags: localBlog.tags || [],  // Changed from tag_ids to tags
       main_image_url: localBlog.main_image_url,
@@ -326,10 +306,7 @@ export class BlogStateService {
       _id: summary.id || summary._id,
       user_id: summary.user_id,
       title: summary.title,
-<<<<<<< HEAD
       username:summary.username,
-=======
->>>>>>> a7a8f08 (feat: home component)
       content: summary.content || summary.blog_body || '',
       tags: summary.tags || [],  // Changed from tag_ids to tags
       main_image_url: summary.main_image_url,
@@ -344,10 +321,7 @@ export class BlogStateService {
       _id: apiResponse.id || apiResponse._id,
       user_id: apiResponse.user_id,
       title: apiResponse.title,
-<<<<<<< HEAD
       username:apiResponse.username,
-=======
->>>>>>> a7a8f08 (feat: home component)
       content: apiResponse.blog_body || apiResponse.content || '',
       tags: apiResponse.tags || [],  // Changed from tag_ids to tags
       main_image_url: apiResponse.main_image_url,

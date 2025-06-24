@@ -1,15 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-<<<<<<< HEAD
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
-import { ImageUploadService } from '../../../core/services/image-upload.service';
-import { ProfilePictureService } from '../../../core/services/profile-picture.service';
 import { takeUntil, Subject } from 'rxjs';
 import { User } from './../../../shared/interfaces/user.interface'
 import { FooterComponent } from '../../../shared/components/footer/footer.component';
 import { InterestsComponent } from '../../../shared/components/interests/interests.component';
+import { HttpErrorResponse } from '@angular/common/http';
 
 // Custom validator for password confirmation
 export function passwordMatchValidator(passwordField: string): ValidatorFn {
@@ -39,7 +37,7 @@ export function passwordStrengthValidator(): ValidatorFn {
     const hasNumber = /[0-9]/.test(value);
     const hasUpper = /[A-Z]/.test(value);
     const hasLower = /[a-z]/.test(value);
-    const hasSpecial = /[^A-Za-z0-9]/.test(value);
+    const hasSpecial = /[#?!@$%^&*-]/.test(value);
     
     const valid = hasNumber && hasUpper && hasLower && hasSpecial;
     if (!valid) {
@@ -49,36 +47,9 @@ export function passwordStrengthValidator(): ValidatorFn {
   };
 }
 
-// Custom validator to disallow spaces in username
-export function noSpacesValidator(): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const value = control.value;
-    if (!value) {
-      return null;
-    }
-    
-    if (value.includes(' ')) {
-      return { noSpaces: true };
-    }
-    
-    return null;
-  };
-}
-
 @Component({
   selector: 'app-profile',
   imports: [CommonModule, ReactiveFormsModule, FooterComponent, InterestsComponent],
-=======
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { AuthService } from '../../../core/services/auth.service';
-import { takeUntil, Subject } from 'rxjs';
-import { User } from './../../../shared/interfaces/user.interface'
-import { FooterComponent } from '../../../shared/components/footer/footer.component';
-
-@Component({
-  selector: 'app-profile',
-  imports: [CommonModule, ReactiveFormsModule, FooterComponent],
->>>>>>> a7a8f08 (feat: home component)
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
@@ -95,45 +66,22 @@ export class ProfileComponent implements OnInit, OnDestroy {
   showCurrentPassword = false;
   showNewPassword = false;
   showConfirmPassword = false;
-<<<<<<< HEAD
   newPasswordStrength = 0;
   activeTab: 'profile' | 'password' | 'interests' = 'profile';
-  
-  // Profile picture upload state
-  isUploadingProfilePicture = false;
-  uploadSuccessMessage = '';
-  uploadErrorMessage = '';
-  
-=======
-  activeTab: 'profile' | 'password' = 'profile';
->>>>>>> a7a8f08 (feat: home component)
   private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-<<<<<<< HEAD
-    private router: Router,
-    private imageUploadService: ImageUploadService,
-    private profilePictureService: ProfilePictureService
-  ) {
-    this.profileForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      username: ['', [Validators.required, Validators.minLength(2), noSpacesValidator()]]
-=======
     private router: Router
   ) {
     this.profileForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      full_name: ['', [Validators.required, Validators.minLength(2)]],
-      bio: [''],
-      profile_image: ['']
->>>>>>> a7a8f08 (feat: home component)
+      username: ['', [Validators.required, Validators.minLength(2)]]
     });
 
     this.passwordForm = this.fb.group({
       current_password: ['', [Validators.required]],
-<<<<<<< HEAD
       new_password: ['', [Validators.required, Validators.minLength(8), passwordStrengthValidator()]],
       confirm_password: ['', [Validators.required, passwordMatchValidator('new_password')]]
     });
@@ -143,10 +91,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
       this.calculatePasswordStrength(password);
       // Revalidate confirm password when password changes
       this.passwordForm.get('confirm_password')?.updateValueAndValidity();
-=======
-      new_password: ['', [Validators.required, Validators.minLength(8)]],
-      confirm_password: ['', [Validators.required]]
->>>>>>> a7a8f08 (feat: home component)
     });
   }
 
@@ -159,13 +103,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
         if (user) {
           this.profileForm.patchValue({
             email: user.email,
-<<<<<<< HEAD
-            username: user.username
-=======
-            full_name: user.full_name || '',
-            bio: user.bio || '',
-            profile_image: user.profile_image || ''
->>>>>>> a7a8f08 (feat: home component)
+            username: user.username || this.generateUsernameFromEmail(user.email)
           });
         }
       });
@@ -187,7 +125,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (this.profileForm.valid) {
       this.successMessage = '';
       this.errorMessage = '';
-<<<<<<< HEAD
       this.isLoading = true;
 
       const newUsername = this.profileForm.value.username;
@@ -202,9 +139,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
               this.isLoading = false;
               setTimeout(() => this.successMessage = '', 5000);
             },
-            error: (error: any) => {
+            error: (error: HttpErrorResponse) => {
               console.error('Username update error:', error);
-              this.errorMessage = this.getProfileUpdateErrorMessage(error);
+              this.errorMessage = error.error?.detail || 'Failed to update username. Please try again.';
               this.isLoading = false;
               setTimeout(() => this.errorMessage = '', 5000);
             }
@@ -214,28 +151,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         setTimeout(() => this.errorMessage = '', 3000);
       }
-=======
-
-      const profileData = {
-        username: this.profileForm.value.email, // Use email as username
-        email: this.profileForm.value.email,
-        full_name: this.profileForm.value.full_name,
-        bio: this.profileForm.value.bio,
-        profile_image: this.profileForm.value.profile_image
-      };
-
-      this.authService.updateProfile(profileData)
-        .subscribe({
-          next: (user) => {
-            this.successMessage = 'Profile updated successfully!';
-            setTimeout(() => this.successMessage = '', 5000);
-          },
-          error: (error) => {
-            console.error('Profile update error:', error);
-            this.errorMessage = error.error?.message || 'Failed to update profile. Please try again.';
-          }
-        });
->>>>>>> a7a8f08 (feat: home component)
     } else {
       Object.keys(this.profileForm.controls).forEach(key => {
         this.profileForm.get(key)?.markAsTouched();
@@ -261,15 +176,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
             this.isPasswordLoading = false;
             setTimeout(() => this.passwordSuccessMessage = '', 5000);
           },
-<<<<<<< HEAD
           error: (error: any) => {
             console.error('Password change error:', error);
-            this.passwordErrorMessage = this.getPasswordChangeErrorMessage(error);
-=======
-          error: (error) => {
-            console.error('Password change error:', error);
             this.passwordErrorMessage = error.error?.message || 'Failed to change password. Please try again.';
->>>>>>> a7a8f08 (feat: home component)
             this.isPasswordLoading = false;
           }
         });
@@ -286,7 +195,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return newPassword === confirmPassword;
   }
 
-<<<<<<< HEAD
   private calculatePasswordStrength(password: string): void {
     if (!password) {
       this.newPasswordStrength = 0;
@@ -326,8 +234,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return 'bg-green-500';
   }
 
-=======
->>>>>>> a7a8f08 (feat: home component)
   togglePasswordVisibility(field: 'current' | 'new' | 'confirm'): void {
     switch (field) {
       case 'current':
@@ -342,22 +248,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
   }
 
-<<<<<<< HEAD
   setActiveTab(tab: 'profile' | 'password' | 'interests'): void {
-=======
-  setActiveTab(tab: 'profile' | 'password'): void {
->>>>>>> a7a8f08 (feat: home component)
     this.activeTab = tab;
     // Clear messages when switching tabs
     this.successMessage = '';
     this.errorMessage = '';
     this.passwordSuccessMessage = '';
     this.passwordErrorMessage = '';
-<<<<<<< HEAD
-    this.uploadSuccessMessage = '';
-    this.uploadErrorMessage = '';
-=======
->>>>>>> a7a8f08 (feat: home component)
   }
 
   getFieldError(form: FormGroup, fieldName: string): string {
@@ -372,18 +269,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
       if (field.errors['minlength']) {
         return `${this.getFieldDisplayName(fieldName)} must be at least ${field.errors['minlength'].requiredLength} characters`;
       }
-<<<<<<< HEAD
       if (field.errors['passwordStrength']) {
         return 'Password must contain uppercase, lowercase, number, and special character';
       }
       if (field.errors['passwordMismatch']) {
         return 'Passwords do not match';
       }
-      if (field.errors['noSpaces']) {
-        return 'Username cannot contain spaces';
-      }
-=======
->>>>>>> a7a8f08 (feat: home component)
     }
     return '';
   }
@@ -396,12 +287,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private getFieldDisplayName(fieldName: string): string {
     const displayNames: Record<string, string> = {
       email: 'Email',
-<<<<<<< HEAD
       username: 'Username',
-=======
-      full_name: 'Full name',
-      bio: 'Bio',
->>>>>>> a7a8f08 (feat: home component)
       current_password: 'Current password',
       new_password: 'New password',
       confirm_password: 'Confirm password'
@@ -410,13 +296,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   getUserInitials(): string {
-<<<<<<< HEAD
-    return this.profilePictureService.getUserInitials(this.currentUser);
-=======
     if (!this.currentUser) return '';
-    const name = this.currentUser.full_name || this.currentUser.username;
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
->>>>>>> a7a8f08 (feat: home component)
+    // Use actual username or fallback to generated username from email
+    const username = this.currentUser.username || this.generateUsernameFromEmail(this.currentUser.email);
+    if (!username) return 'U';
+    
+    // Take first 2 characters of username
+    return username.slice(0, 2).toUpperCase();
   }
 
   getProviderIcon(): string {
@@ -430,359 +316,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
   navigateToHome(): void {
     this.router.navigate(['/home']);
   }
-<<<<<<< HEAD
 
-
-  // Profile picture upload functionality
-  selectProfilePicture(): void {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (event) => this.onProfilePictureSelect(event!);
-    input.click();
+  // Generate username from email (part before @)
+  private generateUsernameFromEmail(email: string): string {
+    if (!email) return '';
+    return email.split('@')[0];
   }
-
-  onProfilePictureSelect(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    
-    if (!file) return;
-    
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      this.showUploadMessage('Please select a valid image file', 'error');
-      return;
-    }
-    
-    // Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      this.showUploadMessage('Image size should be less than 5MB', 'error');
-      return;
-    }
-    
-    this.uploadProfilePicture(file);
-  }
-
-  private uploadProfilePicture(file: File): void {
-    this.isUploadingProfilePicture = true;
-    this.uploadSuccessMessage = '';
-    this.uploadErrorMessage = '';
-    
-    this.imageUploadService.uploadImage(file).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (response) => {
-        if (response && response.imageUrl) {
-          // Update profile with new profile picture
-          this.authService.updateProfile({ profile_picture: response.imageUrl })
-            .subscribe({
-              next: (updatedUser) => {
-                this.isUploadingProfilePicture = false;
-                this.showUploadMessage('Profile picture updated successfully!', 'success');
-                // Update current user in the service and local state
-                this.currentUser = updatedUser;
-              },
-              error: (error) => {
-                console.error('Error updating profile picture:', error);
-                this.isUploadingProfilePicture = false;
-                this.showUploadMessage(this.getProfilePictureUpdateErrorMessage(error), 'error');
-              }
-            });
-        } else {
-          this.isUploadingProfilePicture = false;
-          this.showUploadMessage('Invalid response from server. Please try again.', 'error');
-        }
-      },
-      error: (error) => {
-        console.error('Error uploading image:', error);
-        this.isUploadingProfilePicture = false;
-        this.showUploadMessage(this.getImageUploadErrorMessage(error), 'error');
-      }
-    });
-  }
-
-  removeProfilePicture(): void {
-    this.authService.updateProfile({ profile_picture: '' })
-      .subscribe({
-        next: (updatedUser) => {
-          this.currentUser = updatedUser;
-          this.showUploadMessage('Profile picture removed successfully!', 'success');
-        },
-        error: (error) => {
-          console.error('Error removing profile picture:', error);
-          this.showUploadMessage(this.getProfilePictureRemoveErrorMessage(error), 'error');
-        }
-      });
-  }
-
-  private showUploadMessage(message: string, type: 'success' | 'error'): void {
-    if (type === 'success') {
-      this.uploadSuccessMessage = message;
-      this.uploadErrorMessage = '';
-      setTimeout(() => this.uploadSuccessMessage = '', 5000);
-    } else {
-      this.uploadErrorMessage = message;
-      this.uploadSuccessMessage = '';
-      setTimeout(() => this.uploadErrorMessage = '', 5000);
-    }
-  }
-
-  getProfilePictureUrl(): string | null {
-    return this.profilePictureService.getUserProfilePictureUrl(this.currentUser);
-  }
-
-  onProfilePictureError(event: Event): void {
-    this.profilePictureService.onImageError(event);
-  }
-
-  private getProfileUpdateErrorMessage(error: any): string {
-    // Check for network errors first
-    if (!error.error) {
-      return 'Unable to connect to the server. Please check your internet connection and try again.';
-    }
-
-    const errorData = error.error;
-    const statusCode = error.status;
-    const message = errorData.message || errorData.detail || '';
-    const lowerMessage = message.toLowerCase();
-
-    // Handle specific profile update error scenarios
-    if (lowerMessage.includes('username') && (lowerMessage.includes('already') || lowerMessage.includes('exists') || lowerMessage.includes('taken'))) {
-      return 'This username is already taken. Please choose a different username.';
-    }
-
-    if (lowerMessage.includes('username') && lowerMessage.includes('invalid')) {
-      return 'Username contains invalid characters. Please use only letters, numbers, and underscores.';
-    }
-
-    if (lowerMessage.includes('username') && (lowerMessage.includes('short') || lowerMessage.includes('length'))) {
-      return 'Username is too short. Please use at least 2 characters.';
-    }
-
-    if (lowerMessage.includes('username') && lowerMessage.includes('long')) {
-      return 'Username is too long. Please use less than 50 characters.';
-    }
-
-    if (lowerMessage.includes('rate limit') || lowerMessage.includes('too many requests')) {
-      return 'Too many profile update attempts. Please wait a few minutes before trying again.';
-    }
-
-    if (lowerMessage.includes('unauthorized') || lowerMessage.includes('permission')) {
-      return 'You do not have permission to update this profile. Please sign in again.';
-    }
-
-    if (lowerMessage.includes('maintenance') || lowerMessage.includes('unavailable')) {
-      return 'Profile service is temporarily unavailable. Please try again later.';
-    }
-
-    // Handle HTTP status codes
-    switch (statusCode) {
-      case 400:
-        if (errorData.username && Array.isArray(errorData.username)) {
-          return errorData.username[0] || 'Invalid username provided. Please check the requirements.';
-        }
-        return 'Invalid profile information provided. Please check all fields.';
-      case 401:
-        return 'Your session has expired. Please sign in again to update your profile.';
-      case 403:
-        return 'You do not have permission to update this profile.';
-      case 409:
-        return 'This username is already taken. Please choose a different username.';
-      case 422:
-        return 'The username provided does not meet requirements. Please try a different username.';
-      case 429:
-        return 'Too many profile update attempts. Please wait a few minutes before trying again.';
-      case 500:
-        return 'Server error occurred. Please try again in a few moments.';
-      case 503:
-        return 'Profile service is temporarily unavailable. Please try again later.';
-      default:
-        if (statusCode >= 500) {
-          return 'Server error occurred. Please try again later.';
-        }
-        // Return original message if it's user-friendly
-        if (message && message.length < 200 && !lowerMessage.includes('internal') && !lowerMessage.includes('stack')) {
-          return message;
-        }
-        return 'Failed to update profile. Please try again.';
-    }
-  }
-
-  private getPasswordChangeErrorMessage(error: any): string {
-    // Check for network errors first
-    if (!error.error) {
-      return 'Unable to connect to the server. Please check your internet connection and try again.';
-    }
-
-    const errorData = error.error;
-    const statusCode = error.status;
-    const message = errorData.message || errorData.detail || '';
-    const lowerMessage = message.toLowerCase();
-
-    // Handle specific password change error scenarios
-    if (lowerMessage.includes('current password') && (lowerMessage.includes('incorrect') || lowerMessage.includes('wrong') || lowerMessage.includes('invalid'))) {
-      return 'Current password is incorrect. Please enter your current password correctly.';
-    }
-
-    if (lowerMessage.includes('password') && (lowerMessage.includes('weak') || lowerMessage.includes('strength'))) {
-      return 'New password is too weak. Please include uppercase, lowercase, numbers, and special characters.';
-    }
-
-    if (lowerMessage.includes('password') && (lowerMessage.includes('short') || lowerMessage.includes('length'))) {
-      return 'New password is too short. Please use at least 8 characters.';
-    }
-
-    if (lowerMessage.includes('password') && lowerMessage.includes('common')) {
-      return 'This password is too common. Please choose a more unique password.';
-    }
-
-    if (lowerMessage.includes('password') && lowerMessage.includes('match')) {
-      return 'New passwords do not match. Please ensure both password fields are identical.';
-    }
-
-    if (lowerMessage.includes('password') && lowerMessage.includes('same')) {
-      return 'New password cannot be the same as your current password. Please choose a different password.';
-    }
-
-    if (lowerMessage.includes('rate limit') || lowerMessage.includes('too many attempts')) {
-      return 'Too many password change attempts. Please wait a few minutes before trying again.';
-    }
-
-    if (lowerMessage.includes('unauthorized') || lowerMessage.includes('session')) {
-      return 'Your session has expired. Please sign in again to change your password.';
-    }
-
-    if (lowerMessage.includes('maintenance') || lowerMessage.includes('unavailable')) {
-      return 'Password change service is temporarily unavailable. Please try again later.';
-    }
-
-    // Handle HTTP status codes
-    switch (statusCode) {
-      case 400:
-        if (errorData.current_password && Array.isArray(errorData.current_password)) {
-          return errorData.current_password[0] || 'Current password is incorrect.';
-        }
-        if (errorData.new_password && Array.isArray(errorData.new_password)) {
-          return errorData.new_password[0] || 'New password does not meet requirements.';
-        }
-        return 'Invalid password change information provided. Please check all fields.';
-      case 401:
-        return 'Current password is incorrect. Please enter your current password correctly.';
-      case 403:
-        return 'Your session has expired. Please sign in again to change your password.';
-      case 422:
-        return 'The new password provided does not meet security requirements.';
-      case 429:
-        return 'Too many password change attempts. Please wait a few minutes before trying again.';
-      case 500:
-        return 'Server error occurred. Please try again in a few moments.';
-      case 503:
-        return 'Password change service is temporarily unavailable. Please try again later.';
-      default:
-        if (statusCode >= 500) {
-          return 'Server error occurred. Please try again later.';
-        }
-        // Return original message if it's user-friendly
-        if (message && message.length < 200 && !lowerMessage.includes('internal') && !lowerMessage.includes('stack')) {
-          return message;
-        }
-        return 'Failed to change password. Please try again.';
-    }
-  }
-
-  private getImageUploadErrorMessage(error: any): string {
-    const statusCode = error.status;
-
-    // Handle specific image upload error scenarios
-    switch (statusCode) {
-      case 0:
-        return 'Cannot connect to server. Please check your internet connection and try again.';
-      case 400:
-        return 'Invalid image file. Please choose a valid image format (JPG, PNG, GIF).';
-      case 413:
-        return 'Image file is too large. Please choose a file smaller than 5MB.';
-      case 415:
-        return 'Unsupported file type. Please choose a valid image format (JPG, PNG, GIF).';
-      case 429:
-        return 'Too many upload attempts. Please wait a few minutes before trying again.';
-      case 500:
-        return 'Server error occurred during upload. Please try again in a few moments.';
-      case 503:
-        return 'Image upload service is temporarily unavailable. Please try again later.';
-      default:
-        if (statusCode >= 500) {
-          return 'Server error occurred. Please try again later.';
-        }
-        return 'Failed to upload image. Please try again with a different image.';
-    }
-  }
-
-  private getProfilePictureUpdateErrorMessage(error: any): string {
-    // Check for network errors first
-    if (!error.error) {
-      return 'Unable to connect to the server. Please check your internet connection and try again.';
-    }
-
-    const statusCode = error.status;
-    const errorData = error.error;
-    const message = errorData.message || errorData.detail || '';
-    const lowerMessage = message.toLowerCase();
-
-    // Handle specific profile picture update errors
-    if (lowerMessage.includes('unauthorized') || lowerMessage.includes('session')) {
-      return 'Your session has expired. Please refresh the page and try again.';
-    }
-
-    if (lowerMessage.includes('image') && lowerMessage.includes('invalid')) {
-      return 'The uploaded image is invalid. Please try uploading a different image.';
-    }
-
-    // Handle HTTP status codes
-    switch (statusCode) {
-      case 401:
-        return 'Your session has expired. Please refresh the page and try again.';
-      case 403:
-        return 'You do not have permission to update the profile picture.';
-      case 422:
-        return 'Invalid image data. Please try uploading the image again.';
-      case 500:
-        return 'Server error occurred while updating profile picture. Please try again.';
-      default:
-        return 'Failed to update profile picture. Please try again.';
-    }
-  }
-
-  private getProfilePictureRemoveErrorMessage(error: any): string {
-    // Check for network errors first
-    if (!error.error) {
-      return 'Unable to connect to the server. Please check your internet connection and try again.';
-    }
-
-    const statusCode = error.status;
-    const errorData = error.error;
-    const message = errorData.message || errorData.detail || '';
-    const lowerMessage = message.toLowerCase();
-
-    // Handle specific profile picture removal errors
-    if (lowerMessage.includes('unauthorized') || lowerMessage.includes('session')) {
-      return 'Your session has expired. Please refresh the page and try again.';
-    }
-
-    // Handle HTTP status codes
-    switch (statusCode) {
-      case 401:
-        return 'Your session has expired. Please refresh the page and try again.';
-      case 403:
-        return 'You do not have permission to remove the profile picture.';
-      case 404:
-        return 'Profile picture not found. It may have already been removed.';
-      case 500:
-        return 'Server error occurred while removing profile picture. Please try again.';
-      default:
-        return 'Failed to remove profile picture. Please try again.';
-    }
-  }
-=======
->>>>>>> a7a8f08 (feat: home component)
 }

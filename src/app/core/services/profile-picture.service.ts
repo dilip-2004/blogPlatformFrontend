@@ -1,13 +1,10 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProfilePictureService {
   private readonly s3BaseUrl = 'https://blog-app-2025.s3.amazonaws.com';
-
-  constructor() {}
 
   /**
    * Get the full URL for a profile picture

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /* Interest Collection Popup Styles */
 .interests-popup-overlay {
   position: fixed;
@@ -198,8 +197,6 @@
  
 
 
-=======
->>>>>>> a7a8f08 (feat: home component)
 /* Blog Home Page - Dark Theme */
 
 /* Main Container */
@@ -566,10 +563,7 @@
   overflow: hidden;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
-<<<<<<< HEAD
   cursor: pointer;
-=======
->>>>>>> a7a8f08 (feat: home component)
 }
 
 .post-card:hover {
@@ -832,12 +826,9 @@
 /* Tags Sidebar (30%) */
 .tags-sidebar {
   width: 100%;
-<<<<<<< HEAD
   height: fit-content;
   position: sticky;
   top: 100px;
-=======
->>>>>>> a7a8f08 (feat: home component)
 }
 
 .sidebar-section {
@@ -846,13 +837,8 @@
   border-radius: 16px;
   padding: 1.5rem;
   backdrop-filter: blur(10px);
-<<<<<<< HEAD
   max-height: calc(100vh - 120px);
   overflow-y: auto;
-=======
-  position: sticky;
-  top: 120px;
->>>>>>> a7a8f08 (feat: home component)
 }
 
 .sidebar-title {

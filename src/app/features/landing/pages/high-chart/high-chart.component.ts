@@ -14,25 +14,24 @@ import { mostLiked, postsByCategory, postsOverTime, topTags, Total, usersOverTim
 
 
 export class HighChartComponent implements OnInit {
-  selectedRange = 'all';
   totals!: Total;
 
   constructor(private dashboardService: DashboardService) { }
 
   ngOnInit(): void {
-    this.loadAllCharts(this.selectedRange);
+    this.loadAllCharts();
   }
 
-  loadAllCharts(range: string) {
+  loadAllCharts() {
     this.dashboardService.getTotals().subscribe((data) => {
       this.totals = data;
     });
 
-    this.dashboardService.getPostsOverTime(range).subscribe((data) => {
+    this.dashboardService.getPostsOverTime().subscribe((data) => {
       this.renderPostChart('postsOverTime', data, 'Posts Over Time');
     });
 
-    this.dashboardService.getUsersOverTime(range).subscribe((data) => {
+    this.dashboardService.getUsersOverTime().subscribe((data) => {
       this.renderUserChart('newUsersOverTime', data, 'Users Over Time');
     });
 

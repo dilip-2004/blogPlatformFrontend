@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { DashboardService } from '../../../../core/services/dashboard.service';
 import * as echarts from 'echarts';
 import { mostLiked, postsByCategory, postsOverTime, topTags, Total, usersOverTime } from '../../../../shared/interfaces/dashboard.interface';
-import { color } from 'highcharts';
 
 @Component({
   selector: 'app-echarts',
@@ -11,7 +10,8 @@ import { color } from 'highcharts';
   styleUrl: './echarts.component.css'
 })
 export class EchartsComponent implements OnInit {
-  selectedRange = 'all';
+  selectedPostsRange = 'all';
+  selectedUsersRange = 'all';
   totals:Total={
     total_posts: 0,
     total_users: 0,
@@ -22,21 +22,16 @@ export class EchartsComponent implements OnInit {
   constructor(private dashboardService: DashboardService) {}
 
   ngOnInit(): void {
-    this.loadAllECharts(this.selectedRange);
+    this.loadAllECharts();
   }
 
-  loadAllECharts(range: string) {
+  loadAllECharts() {
     this.dashboardService.getTotals().subscribe(data => {
       this.renderTotalsChart(data);
     });
 
-    this.dashboardService.getPostsOverTime(range).subscribe(data => {
-      this.renderPostChart('postsChart', data, 'Posts Over Time');
-    });
-
-    this.dashboardService.getUsersOverTime(range).subscribe(data => {
-      this.renderUserChart('usersChart', data, 'Users Over Time');
-    });
+    this.loadPostsChart();
+    this.loadUsersChart();
 
     this.dashboardService.getTopTags().subscribe(data => {
       this.renderTopTagsLineChart('tagsChart', data, 'Top Tags');
@@ -48,6 +43,18 @@ export class EchartsComponent implements OnInit {
 
     this.dashboardService.getMostLiked().subscribe(data => {
       this.renderMostLikesChart('likesChart', data, 'Most Liked Posts');
+    });
+  }
+
+  loadPostsChart() {
+    this.dashboardService.getPostsOverTime(this.selectedPostsRange).subscribe(data => {
+      this.renderPostChart('postsChart', data, 'Posts Over Time');
+    });
+  }
+
+  loadUsersChart() {
+    this.dashboardService.getUsersOverTime(this.selectedUsersRange).subscribe(data => {
+      this.renderUserChart('usersChart', data, 'Users Over Time');
     });
   }
 
@@ -126,28 +133,47 @@ export class EchartsComponent implements OnInit {
   const myChart = echarts.init(chartDom);
 
   const option: echarts.EChartsOption = {
+    title: {
+      text: title,
+      left: 'center',
+      top: '5%',
+      textStyle: {
+        fontSize: 16
+      }
+    },
     tooltip: {
-      trigger: 'item'
+      trigger: 'item',
+      formatter: '{a} <br/>{b}: {c} ({d}%)'
     },
     legend: {
-      top: '5%',
-      left: 'center'
+      type: 'scroll',
+      orient: 'horizontal',
+      bottom: '5%',
+      left: 'center',
+      itemWidth: 10,
+      itemHeight: 10,
+      textStyle: {
+        fontSize: 10,
+        overflow: 'truncate',
+        width: 60
+      }
     },
     series: [
       {
         name: title,
         type: 'pie',
-        radius: ['40%', '70%'], // donut-style
-        avoidLabelOverlap: false,
+        radius: ['30%', '60%'], // smaller radius to make room for labels
+        center: ['50%', '45%'], // adjust center to account for title
+        avoidLabelOverlap: true,
         label: {
-          show: false,
-          position: 'center'
+          show: false // hide labels on pie slices to prevent overflow
         },
         emphasis: {
           label: {
             show: true,
-            fontSize: 24,
-            fontWeight: 'bold'
+            fontSize: 14,
+            fontWeight: 'bold',
+            formatter: '{b}\n{c} likes'
           }
         },
         labelLine: {
@@ -155,7 +181,7 @@ export class EchartsComponent implements OnInit {
         },
         data: data.map(item => ({
           value: item.likes,
-          name: item.title
+          name: item.title.length > 20 ? item.title.substring(0, 20) + '...' : item.title // truncate long titles
         }))
       }
     ]
@@ -294,8 +320,15 @@ export class EchartsComponent implements OnInit {
   myChart.setOption(option);
   }
 
-  onRangeChange(event: Event) {
+  onPostsRangeChange(event: Event) {
     const selected = (event.target as HTMLSelectElement).value;
-    this.loadAllECharts(selected);
+    this.selectedPostsRange = selected;
+    this.loadPostsChart();
+  }
+
+  onUsersRangeChange(event: Event) {
+    const selected = (event.target as HTMLSelectElement).value;
+    this.selectedUsersRange = selected;
+    this.loadUsersChart();
   }
 }

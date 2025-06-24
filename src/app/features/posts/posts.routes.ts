@@ -8,22 +8,19 @@ export const postsRoutes: Routes = [
     canActivate: [authGuard]
   },
   {
-<<<<<<< HEAD
-    path: 'write',
-    loadComponent: () => import('./pages/blog-writer/blog-writer.component').then(c => c.BlogWriterComponent),
-    canActivate: [authGuard]
-  },
-  {
     path: 'detail/:id',
     loadComponent: () => import('./pages/blog-detail/blog-detail.component').then(c => c.BlogDetailComponent),
     canActivate: [authGuard]
   },
   {
-=======
->>>>>>> a7a8f08 (feat: home component)
     path: 'edit/:id',
     loadComponent: () => import('./pages/edit-blog/edit-blog.component').then(c => c.EditBlogComponent),
     canActivate: [authGuard]
-  }
+  },
+  {
+    path: 'write',
+    loadComponent: () => import('./pages/blog-writer/blog-writer.component').then(c => c.BlogWriterComponent),
+    canActivate: [authGuard]
+  },
 ];
 

@@ -33,11 +33,7 @@ export function passwordStrengthValidator(): ValidatorFn {
     const hasNumber = /[0-9]/.test(value);
     const hasUpper = /[A-Z]/.test(value);
     const hasLower = /[a-z]/.test(value);
-<<<<<<< HEAD
-    const hasSpecial = /[^A-Za-z0-9]/.test(value);
-=======
     const hasSpecial = /[#?!@$%^&*-]/.test(value);
->>>>>>> a7a8f08 (feat: home component)
     
     const valid = hasNumber && hasUpper && hasLower && hasSpecial;
     if (!valid) {
@@ -70,10 +66,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
     private router: Router
   ) {
     this.registerForm = this.fb.group({
-<<<<<<< HEAD
-=======
-      full_name: ['', [Validators.required, Validators.minLength(2)]],
->>>>>>> a7a8f08 (feat: home component)
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8), passwordStrengthValidator()]],
       confirm_password: ['', [Validators.required, passwordMatchValidator('password')]]
@@ -146,19 +138,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
       this.errorMessage = '';
       this.successMessage = '';
 
-<<<<<<< HEAD
-      const normalizedEmail = this.registerForm.value.email.toLowerCase().trim();
-      // Extract username from email (part before @)
-      const extractedUsername = normalizedEmail.split('@')[0];
       const userData = {
-        username: extractedUsername, // Use name before @ as username
-        email: normalizedEmail,
-=======
-      const userData = {
-        username: this.registerForm.value.email, // Use email as username
+        username: this.registerForm.value.email.split('@')[0], 
         email: this.registerForm.value.email,
-        full_name: this.registerForm.value.full_name,
->>>>>>> a7a8f08 (feat: home component)
         password: this.registerForm.value.password,
         confirm_password: this.registerForm.value.confirm_password
       };
@@ -167,30 +149,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (response) => {
             console.log('Registration response:', response);
-<<<<<<< HEAD
-            
-            // Check if this is email verification flow or direct login
-            if (response.message && response.message.includes('verify your email')) {
-              this.successMessage = response.message;
-            } else if (response.user && response.user.email_verified === false) {
-              this.successMessage = 'Registration successful! Please check your email to verify your account before logging in.';
-            } else {
-              this.successMessage = 'Registration successful! Please log in with your credentials.';
-            }
-=======
             this.successMessage = 'Registration successful! Please log in with your credentials.';
->>>>>>> a7a8f08 (feat: home component)
             
             // Navigate to login page after successful registration
             setTimeout(() => {
               this.router.navigate(['/auth/login']);
-<<<<<<< HEAD
-            }, 3000); // Extended time to read verification message
-          },
-          error: (error) => {
-            console.error('Registration error:', error);
-            this.errorMessage = this.getRegistrationErrorMessage(error);
-=======
             }, 2000);
           },
           error: (error) => {
@@ -204,7 +167,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
             } else {
               this.errorMessage = 'Registration failed. Please try again.';
             }
->>>>>>> a7a8f08 (feat: home component)
           }
         });
     } else {
@@ -257,128 +219,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
     const displayNames: Record<string, string> = {
       username: 'Username',
       email: 'Email',
-<<<<<<< HEAD
-=======
-      full_name: 'Full name',
->>>>>>> a7a8f08 (feat: home component)
       password: 'Password',
       confirm_password: 'Confirm password'
     };
     return displayNames[fieldName] || fieldName;
   }
-<<<<<<< HEAD
-
-  private getRegistrationErrorMessage(error: any): string {
-    // Check for network errors first
-    if (!error.error) {
-      return 'Unable to connect to the server. Please check your internet connection and try again.';
-    }
-
-    const errorData = error.error;
-    const statusCode = error.status;
-
-    // Handle specific server error messages
-    if (errorData.message || errorData.detail) {
-      const message = (errorData.message || errorData.detail).toLowerCase();
-      
-      // Email already exists
-      if (message.includes('email') && (message.includes('already') || message.includes('exists') || message.includes('taken'))) {
-        return 'This email address is already registered. Please use a different email or try signing in instead.';
-      }
-      
-      // Username already exists
-      if (message.includes('username') && (message.includes('already') || message.includes('exists') || message.includes('taken'))) {
-        return 'This username is already taken. Please choose a different username.';
-      }
-      
-      // User already exists (general)
-      if (message.includes('user') && (message.includes('already') || message.includes('exists'))) {
-        return 'An account with these details already exists. Please try signing in or use different information.';
-      }
-      
-      // Password validation errors
-      if (message.includes('password')) {
-        if (message.includes('weak') || message.includes('strength')) {
-          return 'Password is too weak. Please include uppercase, lowercase, numbers, and special characters.';
-        }
-        if (message.includes('match')) {
-          return 'Passwords do not match. Please ensure both password fields are identical.';
-        }
-        if (message.includes('length') || message.includes('short')) {
-          return 'Password is too short. Please use at least 8 characters.';
-        }
-        return 'Invalid password. Please check the password requirements.';
-      }
-      
-      // Email validation errors
-      if (message.includes('email') && (message.includes('invalid') || message.includes('format'))) {
-        return 'Please enter a valid email address.';
-      }
-      
-      // Username validation errors
-      if (message.includes('username') && message.includes('invalid')) {
-        return 'Username contains invalid characters. Please use only letters, numbers, and underscores.';
-      }
-      
-      // Rate limiting
-      if (message.includes('rate') || message.includes('limit') || message.includes('many requests')) {
-        return 'Too many registration attempts. Please wait a few minutes before trying again.';
-      }
-      
-      // Server maintenance
-      if (message.includes('maintenance') || message.includes('unavailable')) {
-        return 'The service is temporarily unavailable. Please try again later.';
-      }
-      
-      // Return the original message if it's user-friendly
-      if (errorData.message.length < 200 && !message.includes('internal') && !message.includes('error')) {
-        return errorData.message;
-      }
-    }
-
-    // Handle field-specific errors
-    if (errorData.email) {
-      if (Array.isArray(errorData.email)) {
-        return errorData.email[0] || 'Email address is invalid.';
-      }
-      return 'This email address is already registered. Please use a different email.';
-    }
-
-    if (errorData.username) {
-      if (Array.isArray(errorData.username)) {
-        return errorData.username[0] || 'Username is invalid.';
-      }
-      return 'This username is already taken. Please choose a different username.';
-    }
-
-    if (errorData.password) {
-      if (Array.isArray(errorData.password)) {
-        return errorData.password[0] || 'Password does not meet requirements.';
-      }
-      return 'Password does not meet the security requirements.';
-    }
-
-    // Handle HTTP status codes
-    switch (statusCode) {
-      case 400:
-        return 'Invalid registration information provided. Please check all fields and try again.';
-      case 409:
-        return 'An account with this email or username already exists. Please use different information.';
-      case 422:
-        return 'The information provided is invalid. Please check all fields and try again.';
-      case 429:
-        return 'Too many registration attempts. Please wait a few minutes before trying again.';
-      case 500:
-        return 'Server error occurred. Please try again in a few moments.';
-      case 503:
-        return 'Registration service is temporarily unavailable. Please try again later.';
-      default:
-        if (statusCode >= 500) {
-          return 'Server error occurred. Please try again later.';
-        }
-        return 'Registration failed. Please check your information and try again.';
-    }
-  }
-=======
->>>>>>> a7a8f08 (feat: home component)
 }

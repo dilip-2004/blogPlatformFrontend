@@ -15,76 +15,20 @@
       <div class="profile-header">
         <!-- Profile Avatar -->
         <div class="profile-avatar-section">
-<<<<<<< HEAD
-          <div class="profile-avatar-container" (click)="selectProfilePicture()">
-            @if (getProfilePictureUrl()) {
-              <img 
-                [src]="getProfilePictureUrl()" 
-                alt="Profile Picture" 
-                class="profile-avatar"
-                (error)="onProfilePictureError($event)"
-              >
-            } @else {
-              <div class="profile-avatar-placeholder">
-                <span class="avatar-initials">{{ getUserInitials() }}</span>
-              </div>
-            }
-            
-            <!-- Upload overlay -->
-            <div class="avatar-upload-overlay">
-              @if (isUploadingProfilePicture) {
-                <div class="upload-spinner">
-                  <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                </div>
-              } @else {
-                <i class="fas fa-camera upload-icon"></i>
-              }
-            </div>
+          <div class="profile-avatar-placeholder">
+            <span class="avatar-initials">{{ getUserInitials() }}</span>
           </div>
-          
-          <!-- Upload Actions -->
-          @if (getProfilePictureUrl() && !isUploadingProfilePicture) {
-            <button 
-              class="remove-picture-btn" 
-              (click)="removeProfilePicture()" 
-              title="Remove profile picture"
-            >
-              <i class="fas fa-times"></i>
-            </button>
-=======
-          @if (currentUser?.profile_image) {
-            <img 
-              class="profile-avatar" 
-              [src]="currentUser?.profile_image" 
-              [alt]="currentUser?.username"
-            >
-          } @else {
-            <div class="profile-avatar-placeholder">
-              <span class="avatar-initials">{{ getUserInitials() }}</span>
-            </div>
->>>>>>> a7a8f08 (feat: home component)
-          }
         </div>
         
         <!-- Profile Info -->
         <div class="profile-info">
           <h1 class="profile-name">
-<<<<<<< HEAD
             {{ currentUser?.username }}
-=======
-            {{ currentUser?.full_name || currentUser?.username }}
->>>>>>> a7a8f08 (feat: home component)
           </h1>
           <p class="profile-email">{{ currentUser?.email }}</p>
           <div class="profile-provider">
             <i [class]="getProviderIcon() + ' provider-icon'"></i>
             <span class="provider-text">{{ getProviderText() }}</span>
-<<<<<<< HEAD
-=======
-            @if (currentUser?.is_verified) {
-              <i class="fas fa-check-circle verified-icon" title="Verified account"></i>
-            }
->>>>>>> a7a8f08 (feat: home component)
           </div>
         </div>
       </div>
@@ -108,7 +52,6 @@
             <i class="fas fa-lock tab-icon"></i>
             <span class="tab-text">Change Password</span>
           </button>
-<<<<<<< HEAD
           <button
             (click)="setActiveTab('interests')"
             [class.active]="activeTab === 'interests'"
@@ -117,8 +60,6 @@
             <i class="fas fa-heart tab-icon"></i>
             <span class="tab-text">My Interests</span>
           </button>
-=======
->>>>>>> a7a8f08 (feat: home component)
         </nav>
       </div>
 
@@ -127,35 +68,10 @@
         <div class="form-section">
           <div class="form-header">
             <h3 class="form-title">Profile Information</h3>
-<<<<<<< HEAD
             <p class="form-subtitle">Update your username. Email address cannot be modified.</p>
           </div>
 
         <!-- Success/Error Messages -->
-        @if (uploadSuccessMessage) {
-          <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-md mb-6 animate-fade-in">
-            <div class="flex items-center">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span class="text-green-700 text-sm">{{ uploadSuccessMessage }}</span>
-            </div>
-          </div>
-        }
-        
-        @if (uploadErrorMessage) {
-          <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-md mb-6 animate-fade-in">
-            <div class="flex items-center">
-              <i class="fas fa-exclamation-circle text-red-500 mr-3"></i>
-              <span class="text-red-700 text-sm">{{ uploadErrorMessage }}</span>
-            </div>
-          </div>
-        }
-        
-=======
-            <p class="form-subtitle">Update your account's profile information and email address.</p>
-          </div>
-
-        <!-- Success/Error Messages -->
->>>>>>> a7a8f08 (feat: home component)
         @if (successMessage) {
           <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-md mb-6 animate-fade-in">
             <div class="flex items-center">
@@ -187,7 +103,6 @@
                 id="email"
                 type="email"
                 formControlName="email"
-<<<<<<< HEAD
                 class="form-input readonly"
                 placeholder="your@email.com"
                 readonly
@@ -198,32 +113,11 @@
           <!-- Username -->
           <div class="form-group">
             <label for="username" class="form-label">Username</label>
-=======
-                class="form-input"
-                [class.input-error]="hasFieldError(profileForm, 'email')"
-                placeholder="your@email.com"
-              >
-            </div>
-            @if (hasFieldError(profileForm, 'email')) {
-              <div class="field-error">
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                  <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7l1.72 1.72L11.72 7 13 8.28 11.28 10 13 11.72 11.72 13 10 11.28 8.28 13 7 11.72 8.72 10 7 8.28 8.28 7z" fill="currentColor"/>
-                </svg>
-                {{ getFieldError(profileForm, 'email') }}
-              </div>
-            }
-          </div>
-
-          <!-- Full Name -->
-          <div class="form-group">
-            <label for="full_name" class="form-label">Full Name</label>
->>>>>>> a7a8f08 (feat: home component)
             <div class="input-wrapper">
               <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill="currentColor"/>
               </svg>
               <input
-<<<<<<< HEAD
                 id="username"
                 type="text"
                 formControlName="username"
@@ -233,54 +127,21 @@
               >
             </div>
             @if (hasFieldError(profileForm, 'username')) {
-=======
-                id="full_name"
-                type="text"
-                formControlName="full_name"
-                class="form-input"
-                [class.input-error]="hasFieldError(profileForm, 'full_name')"
-                placeholder="Your full name"
-              >
-            </div>
-            @if (hasFieldError(profileForm, 'full_name')) {
->>>>>>> a7a8f08 (feat: home component)
               <div class="field-error">
                 <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                   <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7l1.72 1.72L11.72 7 13 8.28 11.28 10 13 11.72 11.72 13 10 11.28 8.28 13 7 11.72 8.72 10 7 8.28 8.28 7z" fill="currentColor"/>
                 </svg>
-<<<<<<< HEAD
                 {{ getFieldError(profileForm, 'username') }}
-=======
-                {{ getFieldError(profileForm, 'full_name') }}
->>>>>>> a7a8f08 (feat: home component)
               </div>
             }
           </div>
 
-<<<<<<< HEAD
-=======
-          <!-- Bio -->
-          <div class="form-group">
-            <label for="bio" class="form-label">Bio</label>
-            <textarea
-              id="bio"
-              formControlName="bio"
-              rows="4"
-              class="form-input"
-              placeholder="Tell us about yourself..."
-            ></textarea>
-          </div>
-
->>>>>>> a7a8f08 (feat: home component)
           <!-- Submit Button -->
           <div class="flex justify-center">
             <button
               type="submit"
               [disabled]="profileForm.invalid || isLoading"
-<<<<<<< HEAD
               class="btn btn-primary"
-=======
->>>>>>> a7a8f08 (feat: home component)
             >
               @if (isLoading) {
                 <div class="flex items-center">
@@ -339,10 +200,7 @@
                 id="current_password"
                 [type]="showCurrentPassword ? 'text' : 'password'"
                 formControlName="current_password"
-<<<<<<< HEAD
                 autocomplete="current-password"
-=======
->>>>>>> a7a8f08 (feat: home component)
                 class="form-input"
                 [class.input-error]="hasFieldError(passwordForm, 'current_password')"
                 placeholder="Enter current password"
@@ -385,16 +243,10 @@
                 id="new_password"
                 [type]="showNewPassword ? 'text' : 'password'"
                 formControlName="new_password"
-<<<<<<< HEAD
                 autocomplete="new-password"
                 class="form-input"
                 [class.input-error]="hasFieldError(passwordForm, 'new_password')"
                 placeholder="Create a strong password"
-=======
-                class="form-input"
-                [class.input-error]="hasFieldError(passwordForm, 'new_password')"
-                placeholder="Enter new password"
->>>>>>> a7a8f08 (feat: home component)
               >
               <button
                 type="button"
@@ -413,7 +265,6 @@
                 </svg>
               </button>
             </div>
-<<<<<<< HEAD
             
             <!-- Password Strength Indicator -->
             @if (passwordForm.get('new_password')?.value && passwordForm.get('new_password')?.touched) {
@@ -434,8 +285,6 @@
               </div>
             }
             
-=======
->>>>>>> a7a8f08 (feat: home component)
             @if (hasFieldError(passwordForm, 'new_password')) {
               <div class="field-error">
                 <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
@@ -457,16 +306,10 @@
                 id="confirm_password"
                 [type]="showConfirmPassword ? 'text' : 'password'"
                 formControlName="confirm_password"
-<<<<<<< HEAD
                 autocomplete="new-password"
                 class="form-input"
                 [class.input-error]="hasFieldError(passwordForm, 'confirm_password')"
                 placeholder="Confirm your new password"
-=======
-                class="form-input"
-                [class.input-error]="hasFieldError(passwordForm, 'confirm_password') || (!passwordsMatch() && passwordForm.get('confirm_password')?.touched)"
-                placeholder="Confirm new password"
->>>>>>> a7a8f08 (feat: home component)
               >
               <button
                 type="button"
@@ -493,24 +336,12 @@
                 {{ getFieldError(passwordForm, 'confirm_password') }}
               </div>
             }
-<<<<<<< HEAD
-=======
-            @if (!passwordsMatch() && passwordForm.get('confirm_password')?.touched && !hasFieldError(passwordForm, 'confirm_password')) {
-              <div class="field-error">
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                  <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7l1.72 1.72L11.72 7 13 8.28 11.28 10 13 11.72 11.72 13 10 11.28 8.28 13 7 11.72 8.72 10 7 8.28 8.28 7z" fill="currentColor"/>
-                </svg>
-                Passwords do not match
-              </div>
-            }
->>>>>>> a7a8f08 (feat: home component)
           </div>
 
           <!-- Submit Button -->
           <div class="flex justify-center">
             <button
               type="submit"
-<<<<<<< HEAD
               [disabled]="passwordForm.invalid || isPasswordLoading"
               class="submit-button"
               [class.loading]="isPasswordLoading"
@@ -525,27 +356,12 @@
                 <svg class="button-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path d="M4.167 10h11.666M10 4.167L15.833 10 10 15.833" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-=======
-              [disabled]="passwordForm.invalid || !passwordsMatch() || isPasswordLoading"
-            >
-              @if (isPasswordLoading) {
-                <div class="flex items-center">
-                  <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Changing...
-                </div>
-              } @else {
-                <span class="flex items-center">
-                  <i class="fas fa-key mr-2"></i>
-                  Change Password
-                </span>
->>>>>>> a7a8f08 (feat: home component)
               }
             </button>
           </div>
         </form>
         </div>
       }
-<<<<<<< HEAD
 
       <!-- Interests Tab Content -->
       @if (activeTab === 'interests') {
@@ -553,8 +369,6 @@
           <app-interests [isFirstTimeSetup]="false"></app-interests>
         </div>
       }
-=======
->>>>>>> a7a8f08 (feat: home component)
       
       <!-- Decorative Elements -->
       <div class="decoration-dots">

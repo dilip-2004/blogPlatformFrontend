@@ -1,35 +1,20 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-<<<<<<< HEAD
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged, pipe, timer } from 'rxjs';
+import { Subject, takeUntil, debounceTime, distinctUntilChanged, timer } from 'rxjs';
 import { BlogService } from '../../../../core/services/blog.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { ProfilePictureService } from '../../../../core/services/profile-picture.service';
-import { PostSummary } from '../../../../shared/interfaces/post.interface';
+import { BlogSummary } from '../../../../shared/interfaces/post.interface';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { InterestsComponent } from '../../../../shared/components/interests/interests.component';
 import { InterestsService } from '../../../../core/services/interests.service';
 import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
-=======
-import { RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
-import { BlogService } from '../../../../core/services/blog.service';
-import { AuthService } from '../../../../core/services/auth.service';
-import { PostSummary } from '../../../../shared/interfaces/post.interface';
-import { FooterComponent } from '../../../../shared/components/footer/footer.component';
->>>>>>> a7a8f08 (feat: home component)
 
 @Component({
   selector: 'app-home',
   standalone: true,
-<<<<<<< HEAD
   imports: [CommonModule, RouterLink, FormsModule,FooterComponent,InterestsComponent, DateFormatPipe],
-=======
-  imports: [CommonModule, RouterLink, FormsModule,FooterComponent],
->>>>>>> a7a8f08 (feat: home component)
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -38,13 +23,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   private searchSubject = new Subject<string>();
   
   // Blog data
-  posts: PostSummary[] = [];
+  posts: BlogSummary[] = [];
   recommendedTags: string[] = [];
-<<<<<<< HEAD
-  trendingTags: string[] = [];
-  allTags: string[] = [];
-=======
->>>>>>> a7a8f08 (feat: home component)
   loading = false;
   searchQuery = '';
   currentPage = 1;
@@ -54,7 +34,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   currentUser: any = null;
   isUserMenuOpen = false;
-<<<<<<< HEAD
 
     // Interest popup state
   showInterestsPopup = false;
@@ -64,15 +43,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private blogService: BlogService,
     private authService: AuthService,
-    private profilePictureService: ProfilePictureService,
     private router: Router,
     private interestsService:InterestsService
-=======
-  
-  constructor(
-    private blogService: BlogService,
-    private authService: AuthService
->>>>>>> a7a8f08 (feat: home component)
   ) {
     // Setup search debouncing
     this.searchSubject.pipe(
@@ -99,7 +71,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe((isAuth: boolean) => {
       this.isAuthenticated = isAuth;
-<<<<<<< HEAD
       // Check user interests only if authenticated
       if (isAuth) {
         // Delay to ensure user data is loaded
@@ -107,8 +78,6 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.checkUserInterests();
         });
       }
-=======
->>>>>>> a7a8f08 (feat: home component)
     });
     
     // Subscribe to current user
@@ -119,15 +88,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-<<<<<<< HEAD
   getFirstName(fullName?: string): string {
-    if (!fullName) return 'Unknown';
-    // Return the full username as-is
-    return fullName;
+    if (!fullName) return '';
+    return fullName.includes('@') ? fullName.split('@')[0] : fullName;
   }
 
-=======
->>>>>>> a7a8f08 (feat: home component)
   private loadInitialData(): void {
     this.loadPosts();
     this.loadRecommendedTags();
@@ -147,19 +112,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (response) => {
         this.posts = response.posts;
-<<<<<<< HEAD
-        this.currentPage = response.page;
-        this.totalPages = response.total_pages;
-        this.loading = false;
-        
-        // Extract and update trending tags from current posts
-        this.updateTrendingTags();
-=======
+        console.log(this.posts);
         console.log('Loaded posts:', this.posts);
         this.currentPage = response.page;
         this.totalPages = response.total_pages;
         this.loading = false;
->>>>>>> a7a8f08 (feat: home component)
       },
       error: (error) => {
         console.error('Error loading posts:', error);
@@ -173,12 +130,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: (tags) => {
-<<<<<<< HEAD
-        this.allTags = tags;
-        this.updateRecommendedTags();
-=======
-        this.recommendedTags = tags.slice(0, 20); // Limit to 20 tags
->>>>>>> a7a8f08 (feat: home component)
+        const shuffledTags = [...tags].sort(() => 0.5 - Math.random());
+        this.recommendedTags = shuffledTags.slice(0, 20);
       },
       error: (error) => {
         console.error('Error loading tags:', error);
@@ -186,60 +139,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-<<<<<<< HEAD
-  private updateTrendingTags(): void {
-    // Extract all tags from current posts
-    const tagCount = new Map<string, number>();
-    
-    this.posts.forEach(post => {
-      if (post.tags && Array.isArray(post.tags)) {
-        post.tags.forEach(tag => {
-          const normalizedTag = tag.trim().toLowerCase();
-          if (normalizedTag) {
-            tagCount.set(normalizedTag, (tagCount.get(normalizedTag) || 0) + 1);
-          }
-        });
-      }
-    });
-
-    // Sort tags by frequency and get the most popular ones
-    this.trendingTags = Array.from(tagCount.entries())
-      .sort((a, b) => b[1] - a[1]) // Sort by count descending
-      .slice(0, 10) // Take top 10
-      .map(entry => entry[0]); // Get just the tag names
-
-    console.log('🔥 Trending tags from current posts:', this.trendingTags);
-    
-    // Update recommended tags to combine trending and all tags
-    this.updateRecommendedTags();
-  }
-
-  private updateRecommendedTags(): void {
-    // Combine trending tags (from current posts) with other available tags
-    const combinedTags = new Set<string>();
-    
-    // First, add trending tags (higher priority)
-    this.trendingTags.forEach(tag => combinedTags.add(tag));
-    
-    // Then add other tags from all available tags, avoiding duplicates
-    this.allTags.forEach(tag => {
-      if (!this.trendingTags.includes(tag.toLowerCase())) {
-        combinedTags.add(tag);
-      }
-    });
-    
-    // Convert to array and limit to 20 tags
-    this.recommendedTags = Array.from(combinedTags).slice(0, 20);
-    
-    console.log('✨ Updated recommended tags:', {
-      trending: this.trendingTags,
-      recommended: this.recommendedTags,
-      totalAvailable: this.allTags.length
-    });
-  }
-
-=======
->>>>>>> a7a8f08 (feat: home component)
   onSearchInput(query: string): void {
     console.log('Search input:', query);
     this.searchQuery = query;
@@ -311,23 +210,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.loadPosts(page);
     }
   }
-
-<<<<<<< HEAD
-
-=======
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  }
->>>>>>> a7a8f08 (feat: home component)
-
-  getPlaceholderImage(): string {
-    return 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-  }
   
   getDefaultAvatar(): string {
     // Return a data URL for a simple colored circle with initials
@@ -336,39 +218,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     return this.generateAvatarDataUrl(initials);
   }
 
-<<<<<<< HEAD
-  getUserProfilePicture(): string | null {
-    const profilePicture = this.currentUser?.profile_picture || this.currentUser?.profile_image;
-    
-    if (!profilePicture || profilePicture.trim() === '') {
-      return null;
-    }
-    
-    // If it's already a full URL (starts with http/https), return as is
-    if (profilePicture.startsWith('http://') || profilePicture.startsWith('https://')) {
-      return profilePicture;
-    }
-    
-    // If it's an AWS S3 key/path, ensure it's a complete URL
-    if (profilePicture.startsWith('uploads/')) {
-      return `https://blog-app-2025.s3.amazonaws.com/${profilePicture}`;
-    }
-    
-    // If it contains amazonaws.com, it's already a complete S3 URL
-    if (profilePicture.includes('amazonaws.com')) {
-      return profilePicture;
-    }
-    
-    // If it's a data URL (base64), return as is
-    if (profilePicture.startsWith('data:')) {
-      return profilePicture;
-    }
-    
-    return null;
-  }
-
-=======
->>>>>>> a7a8f08 (feat: home component)
   private getInitials(name: string): string {
     return name
       .split(' ')
@@ -402,65 +251,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
   
   getImageUrl(imageUrl: string | undefined): string | null {
-<<<<<<< HEAD
-    // Use ProfilePictureService for consistent image URL handling
-    return this.profilePictureService.getProfilePictureUrl(imageUrl);
-  }
-
-  // Get author profile picture URL for posts (same as blog-detail)
-  getAuthorProfilePictureUrl(post: PostSummary): string | null {
-    console.log('🖼️ getAuthorProfilePictureUrl called for post:', {
-      postId: post.id,
-      title: post.title,
-      author: post.author,
-      authorId: post.author_id,
-      username: post.username
-    });
-    
-    console.log('🔍 Author object detailed:', {
-      hasAuthor: !!post.author,
-      authorId: post.author?.id,
-      authorUsername: post.author?.username,
-      authorProfilePicture: post.author?.profile_picture,
-      authorKeys: post.author ? Object.keys(post.author) : null
-    });
-    
-    // If the post author is the current user, use current user's profile picture
-    const currentUser = this.authService.getCurrentUser();
-    
-    if (currentUser && post) {
-      const currentUserId = currentUser._id || currentUser.id;
-      console.log('🔍 Current user check:', { currentUserId, postAuthorId: post.author_id });
-      
-      if (currentUserId === post.author_id) {
-        // Use live current user data for own posts
-        const profileUrl = this.profilePictureService.getUserProfilePictureUrl(currentUser);
-        console.log('✅ Using current user profile picture:', profileUrl);
-        return profileUrl;
-      }
-    }
-    
-    // For other users' posts, check if we have the profile picture in the author object
-    if (post && post.author) {
-      const profileUrl = this.profilePictureService.getUserProfilePictureUrl(post.author);
-      if (profileUrl) {
-        console.log('✅ Using post author profile picture:', profileUrl);
-        return profileUrl;
-      } else {
-        console.log('⚠️ Author exists but no profile_picture field or it\'s null/undefined');
-      }
-    }
-    
-    console.log('❌ No profile picture found for post');
-    return null;
-  }
-
-  // Get author initials for fallback
-  getAuthorInitials(post: PostSummary): string {
-    const authorName = post.username || 'Unknown';
-    return this.profilePictureService.getUserInitials({ username: authorName });
-  }
-=======
     // Return null if the image URL is not available
     if (!imageUrl || imageUrl.trim() === '') {
       return null;
@@ -490,12 +280,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     // Default fallback for other cases
     return null;
   }
->>>>>>> a7a8f08 (feat: home component)
-  
-  onImageError(event: any): void {
-    // Set fallback image when S3 image fails to load
-    event.target.src = this.getPlaceholderImage();
-  }
   
   toggleUserMenu(event: Event): void {
     event.stopPropagation();
@@ -523,11 +307,23 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.closeUserMenu();
     }
   }
-<<<<<<< HEAD
 
   // Navigate to blog detail page
   navigateToBlogDetail(postId: string): void {
     this.router.navigate(['/posts/detail', postId]);
+  }
+
+  // Helper method to extract tag names from tags array
+  getTagNames(tags: any[]): string[] {
+    if (!tags) return [];
+    return tags.map(tag => {
+      if (typeof tag === 'string') {
+        return tag;
+      } else if (tag && tag.name) {
+        return tag.name;
+      }
+      return '';
+    }).filter(name => name);
   }
 
   // interest page popup
@@ -581,7 +377,3 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.showInterestsPopup = false;
   }
 }
-=======
-}
-
->>>>>>> a7a8f08 (feat: home component)

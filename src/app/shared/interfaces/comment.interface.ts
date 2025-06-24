@@ -1,6 +1,3 @@
-import { User } from './user.interface';
-
-<<<<<<< HEAD
 // Comment interfaces matching backend format
 export interface Comment {
   _id: string;
@@ -24,19 +21,6 @@ export interface CommentResponse {
   text: string;
   created_at: string;
   updated_at?: string;
-=======
-export interface Comment {
-  id: string;
-  content: string;
-  author_id: string;
-  author: User;
-  post_id: string;
-  parent_id?: string;
-  replies?: Comment[];
-  created_at: string;
-  updated_at?: string;
-  is_edited: boolean;
->>>>>>> a7a8f08 (feat: home component)
 }
 export interface CreateCommentRequest {
   content: string;
@@ -54,5 +38,9 @@ export interface CommentsResponse {
   page: number;
   limit: number;
   total_pages: number;
+}
+
+export interface CommentCreate {
+  text: string;
 }
 
