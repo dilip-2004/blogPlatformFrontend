@@ -1,0 +1,70 @@
+<div class="dashboard-wrapper">
+  <!-- Filter Header -->
+  <div class="dashboard-header">
+    <div class="flex">
+      <div>
+        <h2>Dashboard Overview</h2>
+        <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">Real-time analytics and insights</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label style="font-weight: 500; opacity: 0.9;">Posts Time Range:</label>
+          <select (change)="onPostsRangeChange($event)">
+            <option value="7d">Last 7 Days</option>
+            <option value="6m">Last 6 Months</option>
+            <option value="1y">Last 1 Year</option>
+            <option value="all" selected>All Time</option>
+          </select>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <label style="font-weight: 500; opacity: 0.9;">Users Time Range:</label>
+          <select (change)="onUsersRangeChange($event)">
+            <option value="7d">Last 7 Days</option>
+            <option value="6m">Last 6 Months</option>
+            <option value="1y">Last 1 Year</option>
+            <option value="all" selected>All Time</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-cards-grid">
+    <div class="stat-card">
+      <span class="stat-value">{{ totals.total_posts }}</span>
+      <span class="stat-label">Total Posts</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ totals.total_users }}</span>
+      <span class="stat-label">Total Users</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ totals.total_comments }}</span>
+      <span class="stat-label">Total Comments</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ totals.total_likes }}</span>
+      <span class="stat-label">Total Likes</span>
+    </div>
+  </div>
+
+  <!-- Charts Grid -->
+  <div class="charts-grid">
+    <div class="chart-container">
+      <div id="postsChart" class="chart-wrapper"></div>
+    </div>
+    <div class="chart-container">
+      <div id="usersChart" class="chart-wrapper"></div>
+    </div>
+    <div class="chart-container">
+      <div id="likesChart" class="chart-wrapper"></div>
+    </div>
+    <div class="chart-container">
+      <div id="tagsChart" class="chart-wrapper"></div>
+    </div>
+    <div class="chart-container">
+      <div id="categoryChart" class="chart-wrapper"></div>
+    </div>
+  </div>
+</div>
