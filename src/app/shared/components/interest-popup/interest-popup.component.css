@@ -5,7 +5,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,7 +14,7 @@
 }
 
 .interests-popup-container {
-  background: white;
+  background: rgba(31, 41, 55, 0.6);
   border-radius: 16px;
   max-width: 600px;
   width: 100%;
@@ -47,18 +47,18 @@
   border-radius: 50%;
   transition: background-color 0.2s;
   z-index: 10;
-  color: #6b7280;
+  color: #e5e7eb;
 }
 
 .popup-close-btn:hover {
-  background-color: #f3f4f6;
-  color: #374151;
+  background-color: rgba(107, 114, 128, 0.3);
+  color: #ffffff;
 }
 
 .popup-header {
   text-align: center;
   padding: 32px 32px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid rgba(102, 126, 234, 0.2);
 }
 
 .popup-icon {
@@ -68,13 +68,13 @@
 .popup-title {
   font-size: 24px;
   font-weight: 700;
-  color: #1f2937;
+  color: #e5e7eb;
   margin-bottom: 8px;
   line-height: 1.3;
 }
 
 .popup-subtitle {
-  color: #6b7280;
+  color: #9ca3af;
   font-size: 16px;
   line-height: 1.5;
   margin: 0;
@@ -87,11 +87,11 @@
 .popup-footer {
   padding: 16px 32px 32px;
   text-align: center;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid rgba(102, 126, 234, 0.2);
 }
 
 .skip-text {
-  color: #6b7280;
+  color: #9ca3af;
   font-size: 14px;
   margin-bottom: 16px;
 }
@@ -102,18 +102,18 @@
   gap: 6px;
   padding: 8px 16px;
   background: none;
-  border: 1px solid #d1d5db;
+  border: 1px solid rgba(102, 126, 234, 0.2);
   border-radius: 8px;
-  color: #6b7280;
+  color: #e5e7eb;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .skip-popup-btn:hover {
-  background-color: #f9fafb;
-  border-color: #9ca3af;
-  color: #374151;
+  background-color: rgba(102, 126, 234, 0.1);
+  border-color: rgba(102, 126, 234, 0.4);
+  color: #ffffff;
 }
 
 /* Mobile Responsive */
