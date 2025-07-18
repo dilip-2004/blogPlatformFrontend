@@ -105,13 +105,8 @@
           </div>
           
           <!-- Main Add Button -->
-          <div class="add-block-container add-menu-container" 
-               [class.menu-open]="showAddMenu && currentBlockId === null"
-               (mouseenter)="toggleAddMenu()"
-               (mouseleave)="closeAddMenu()">
-            <button class="add-block-btn main-add" 
-                    (click)="toggleAddMenu()"
-                    (mouseenter)="toggleAddMenu()">
+          <div class="add-block-container add-menu-container">
+            <button class="add-block-btn main-add" (click)="toggleAddMenu()">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
@@ -199,37 +194,43 @@
               
               <!-- Image Block -->
               <div *ngIf="block.type === 'image'" class="image-block">
-                <div class="image-input-container">
+                <!-- Image Upload Options -->
+                <div class="image-upload-options">
+                  <button 
+                    type="button" 
+                    class="upload-btn" 
+                    (click)="selectImageFile(block.id)"
+                    [disabled]="isUploadingImage"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    {{ isUploadingImage ? 'Uploading...' : 'Upload from Device' }}
+                  </button>
+                  
+                  <span class="upload-divider">or</span>
+                  
                   <input 
                     type="url"
                     class="image-url-input"
                     [id]="'block-' + block.id"
-                    placeholder="Paste image URL or upload file"
+                    placeholder="Paste image URL"
                     [value]="block.data"
                     (input)="onBlockChange(block.id, $any($event.target).value)"
                   />
-                  
-                  <!-- Upload Button -->
-                  <button 
-                    type="button" 
-                    class="upload-btn"
-                    (click)="selectImageFile(block.id)"
-                    [disabled]="isUploadingImage"
-                    title="Upload image from your device"
-                  >
-                    <span *ngIf="!isUploadingImage">📁 Upload</span>
-                    <span *ngIf="isUploadingImage">⏳ Uploading...</span>
-                  </button>
+                </div>
+                
+                <!-- Loading State -->
+                <div *ngIf="isUploadingImage" class="upload-loading">
+                  <div class="loading-spinner"></div>
+                  <span>Uploading to AWS S3...</span>
                 </div>
                 
                 <!-- Image Preview -->
-                <div *ngIf="block.data" class="image-preview">
-                  <img 
-                    [src]="block.data" 
-                    [alt]="'Image preview'"
-                    (load)="onImageLoad($event, block.id)"
-                    (error)="onImageError($event, block.id)"
-                  />
+                <div *ngIf="block.data && !isUploadingImage" class="image-preview">
+                  <img [src]="block.data" [alt]="'Image preview'" 
+                       (error)="onImageError($event, block.id)" 
+                       (load)="onImageLoad($event, block.id)" />
                   <div class="image-url-display">
                     <small>{{ block.data }}</small>
                   </div>
@@ -239,13 +240,8 @@
           </div>
 
           <!-- Add Block Between Elements -->
-          <div class="add-block-container add-menu-container" 
-               [class.menu-open]="showAddMenu && currentBlockId === block.id"
-               (mouseenter)="toggleAddMenu(block.id)"
-               (mouseleave)="closeAddMenu()">
-            <button class="add-block-btn" 
-                    (click)="toggleAddMenu(block.id)"
-                    (mouseenter)="toggleAddMenu(block.id)">
+          <div class="add-block-container add-menu-container">
+            <button class="add-block-btn" (click)="toggleAddMenu(block.id)">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
@@ -341,7 +337,7 @@
           <!-- Upload Loading -->
           <div *ngIf="isUploadingMainImage" class="upload-loading">
             <div class="loading-spinner"></div>
-            <span>Uploading image...</span>
+            <span>Uploading main image...</span>
           </div>
         </div>
       </div>
@@ -357,7 +353,7 @@
             <input 
               type="text" 
               class="tag-input" 
-              placeholder="Enter tag name (case-insensitive)..."
+              placeholder="Enter tag name..." 
               [(ngModel)]="newTagInput"
               (keyup.enter)="addCustomTag()"
               maxlength="20"

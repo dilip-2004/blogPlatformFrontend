@@ -1,10 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import * as HighchartsStock from 'highcharts/highstock';
 import { DashboardService } from '../../../../core/services/dashboard.service';
 import { CommonModule } from '@angular/common';
-import { WebSocketService } from '../../services/web-socket.service';
-import { Subject, takeUntil } from 'rxjs';
 import { mostLiked, postsByCategory, postsOverTime, topTags, Total, usersOverTime } from '../../../../shared/interfaces/dashboard.interface';
 
 @Component({
@@ -16,36 +14,12 @@ import { mostLiked, postsByCategory, postsOverTime, topTags, Total, usersOverTim
 
 
 export class HighChartComponent implements OnInit {
-  private destroy$ = new Subject<void>();
   totals!: Total;
 
-  constructor(private dashboardService: DashboardService, private webSocketService: WebSocketService) { }
+  constructor(private dashboardService: DashboardService) { }
 
   ngOnInit(): void {
     this.loadAllCharts();
-    this.webSocketService.connect('ws://localhost:8080');
-    this.webSocketService.messages$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((data: any) => {
-        if (data.postsOverTime) {
-          this.renderPostChart('postsOverTime', data.postsOverTime, 'Posts Over Time (Live)');
-        }
-        if (data.usersOverTime) {
-          this.renderUserChart('newUsersOverTime', data.usersOverTime, 'Users Over Time (Live)');
-        }
-        if (data.totals) {
-          this.totals = data.totals;
-        }
-        if (data.postsByCategory) {
-          this.renderPostsByCategory('postsByCategory', data.postsByCategory, 'Posts by Category (Live)');
-        }
-        if (data.topTags) {
-          this.renderTopTagsPieChart('mostPopularCategory', data.topTags, 'Top Tags (Live)');
-        }
-        if (data.mostLiked) {
-          this.renderMostLikedPosts('mostLikedPosts', data.mostLiked, 'Most Liked Posts (Live)');
-        }
-      });
   }
 
   loadAllCharts() {
@@ -149,7 +123,5 @@ export class HighChartComponent implements OnInit {
         enabled: false
       }
     });
-
-    
   }
 }

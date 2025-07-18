@@ -9,7 +9,6 @@ import { ImageUploadService } from '../../../../core/services/image-upload.servi
 import { Blog, UpdateBlogRequest, Tag } from '../../../../shared/interfaces/post.interface';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
-import { normalizeTag, normalizeTags, areTagsEqual } from '../../../../shared/utils/tag.util';
 
 export interface BlogBlock {
   id: string;
@@ -45,7 +44,6 @@ export class EditBlogComponent implements OnInit, OnDestroy {
   showUnsavedChangesModal = false;
   pendingNavigation: string | null = null;
   isUploadingImage = false;
-  private hoverTimeout: any = null;
   
   // Republish modal state
   showRepublishModal = false;
@@ -229,28 +227,14 @@ export class EditBlogComponent implements OnInit, OnDestroy {
 
   // Toggle add menu
   toggleAddMenu(blockId?: string): void {
-    // Clear any pending close timeout
-    if (this.hoverTimeout) {
-      clearTimeout(this.hoverTimeout);
-      this.hoverTimeout = null;
-    }
-    
     this.currentBlockId = blockId || null;
-    this.showAddMenu = true; // Always show on hover/click
+    this.showAddMenu = !this.showAddMenu;
   }
 
-  // Close add menu with delay to prevent accidental closing
+  // Close add menu
   closeAddMenu(): void {
-    // Clear any existing timeout
-    if (this.hoverTimeout) {
-      clearTimeout(this.hoverTimeout);
-    }
-    
-    // Add a small delay before closing to prevent accidental closing
-    this.hoverTimeout = setTimeout(() => {
-      this.showAddMenu = false;
-      this.currentBlockId = null;
-    }, 200); // 200ms delay
+    this.showAddMenu = false;
+    this.currentBlockId = null;
   }
 
   // Add new block
@@ -322,6 +306,11 @@ export class EditBlogComponent implements OnInit, OnDestroy {
   }
 
   saveChanges(): void {
+    if (!this.hasChanges) {
+      this.showMessageContainer('No changes to save.', 'info');
+      return;
+    }
+
     if (!this.blogTitle.trim()) {
       this.showMessageContainer('Please enter a blog title', 'error');
       return;
@@ -332,21 +321,12 @@ export class EditBlogComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Always allow opening republish modal to edit main image and tags
+    // Open republish modal to edit main image and tags
     this.showRepublishModal = true;
   }
   
   // Perform the actual save operation
   performSave(): void {
-    // Final change detection check before saving
-    this.checkForChanges();
-    
-    if (!this.hasChanges) {
-      this.showMessageContainer('No changes detected to save.', 'info');
-      this.showRepublishModal = false;
-      return;
-    }
-    
     this.saving = true;
     this.isRepublishing = true;
     
@@ -354,7 +334,7 @@ export class EditBlogComponent implements OnInit, OnDestroy {
       title: this.blogTitle,
       content: JSON.stringify(this.blogBlocks),
       main_image_url: this.mainImageUrl,
-      tags: normalizeTags(this.selectedTags)
+      tags: this.selectedTags  // Changed from tag_ids to tags
     };
 
     // Use blogService.updateBlog directly to ensure MongoDB update
@@ -478,7 +458,7 @@ export class EditBlogComponent implements OnInit, OnDestroy {
         console.log('Full upload response:', response);
         if (response && response.imageUrl) {
           block.data = response.imageUrl;
-          console.log('Image uploaded successfully:', response.imageUrl);
+          console.log('Image uploaded to S3 successfully:', response.imageUrl);
           this.showMessageContainer('Image uploaded successfully!', 'success');
           this.isUploadingImage = false;
           this.checkForChanges(); // Mark as changed
@@ -611,7 +591,7 @@ export class EditBlogComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (response) => {
         this.mainImageUrl = response.imageUrl;
-        console.log('Main image uploaded successfully:', response.imageUrl);
+        console.log('Main image uploaded to S3:', response.imageUrl);
         this.showMessageContainer('Main image uploaded successfully!', 'success');
         this.isUploadingMainImage = false;
         this.checkForChanges();
@@ -648,8 +628,7 @@ export class EditBlogComponent implements OnInit, OnDestroy {
       return;
     }
     
-    const norm = normalizeTag(tagName);
-    if (this.selectedTags.some(t => areTagsEqual(t, norm))) {
+    if (this.selectedTags.includes(tagName)) {
       this.showMessageContainer('Tag already added', 'error');
       return;
     }
@@ -659,7 +638,7 @@ export class EditBlogComponent implements OnInit, OnDestroy {
       return;
     }
     
-    this.selectedTags.push(norm);
+    this.selectedTags.push(tagName);
     this.newTagInput = '';
     this.checkForChanges();
   }
@@ -675,13 +654,12 @@ export class EditBlogComponent implements OnInit, OnDestroy {
 
   // Add tag from recommended list
   addRecommendedTag(tagName: string): void {
-    const norm = normalizeTag(tagName);
-    if (!this.selectedTags.some(t => areTagsEqual(t, norm))) {
+    if (!this.selectedTags.includes(tagName)) {
       if (this.selectedTags.length >= 10) {
         this.showMessageContainer('Maximum 10 tags allowed', 'error');
         return;
       }
-      this.selectedTags.push(norm);
+      this.selectedTags.push(tagName);
       this.checkForChanges();
     }
   }

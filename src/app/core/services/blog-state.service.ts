@@ -2,25 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { BlogService } from './blog.service';
-import { Blog, UpdateBlogRequest, BlogSummary } from '../../shared/interfaces/post.interface';
-
-interface BlogState {
-  blogs: Blog[];
-  loading: boolean;
-  error: string | null;
-  selectedBlog: Blog | null;
-  hasChanges: boolean;
-  originalContent: string | null;
-}
-
-const initialState: BlogState = {
-  blogs: [],
-  loading: false,
-  error: null,
-  selectedBlog: null,
-  hasChanges: false,
-  originalContent: null
-};
+import { Blog, UpdateBlogRequest } from '../../shared/interfaces/post.interface';
+import { BlogState,initialState } from '../../shared/interfaces/blog'
 
 @Injectable({
   providedIn: 'root'

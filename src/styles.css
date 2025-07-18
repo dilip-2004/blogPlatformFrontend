@@ -68,34 +68,24 @@
 }
 
 /* Global styles */
-html {
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
-  min-height: 100%;
-}
-
 body {
   margin: 0;
   padding: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.6;
   color: #ffffff;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
-  background-attachment: fixed;
+  background-color: #0a0a0a;
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Layout structure */
 router-outlet + * {
   flex: 1;
-}
-
-/* Prevent flex interference with blog writer */
-router-outlet + .blog-writer,
-app-blog-writer {
-  flex: none !important;
 }
 
 /* Page layout with proper spacing for fixed header */
@@ -105,7 +95,6 @@ app-blog-writer {
   display: flex;
   flex-direction: column;
 }
-
 
 /* Main content area should grow */
 .main-content {
@@ -375,17 +364,15 @@ a:hover {
 
 /* Dark mode as default */
 :root {
-  /* Dark theme color overrides - matching UI theme */
-  --color-bg-primary: rgba(10, 10, 10, 0.95);
-  --color-bg-secondary: rgba(31, 41, 55, 0.8);
-  --color-bg-tertiary: rgba(17, 24, 39, 0.6);
+  /* Dark theme color overrides */
+  --color-bg-primary: #0a0a0a;
+  --color-bg-secondary: #1a1a1a;
+  --color-bg-tertiary: #2a2a2a;
   --color-text-primary: #ffffff;
   --color-text-secondary: #e5e7eb;
   --color-text-muted: #9ca3af;
-  --color-border: rgba(102, 126, 234, 0.1);
-  --color-border-light: rgba(102, 126, 234, 0.2);
-  --color-accent-primary: #667eea;
-  --color-accent-secondary: #764ba2;
+  --color-border: #374151;
+  --color-border-light: #4b5563;
 }
 
 /* Enhanced dark theme support */

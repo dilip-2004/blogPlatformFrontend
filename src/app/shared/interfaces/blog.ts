@@ -1,4 +1,5 @@
-import { PostSummary } from "./post.interface";
+import { EntityState } from "./api.interface";
+import { Blog } from "./post.interface";
 
 // Add these interfaces to your types file
 export interface BlogResponse {
@@ -14,12 +15,6 @@ export interface BlogResponse {
   updated_at: string | Date;
   comment_count: number;
   likes_count: number;
-  // SEO fields
-  meta_title?: string;
-  meta_description?: string;
-  // Status fields
-  status?: 'draft' | 'published' | 'archived';
-  // Engagement metrics
   view_count?: number;
   reading_time?: number; // in minutes
   // Relationships
@@ -41,10 +36,26 @@ export interface SearchBlogsResponse {
   total_pages: number;
 }
 
-export interface PostsResponse {
-  posts: PostSummary[];
-  total: number;
-  page: number;
-  limit: number;
-  total_pages: number;
+export interface BlogState extends EntityState<Blog> {
+  blogs: Blog[]; 
+  selectedBlog: Blog | null;
+  hasChanges: boolean;
+  originalContent: string | null;
+}
+
+ export const  initialState: BlogState = {
+  items: [], 
+  selectedItem: null,
+  blogs: [],
+  loading: false,
+  error: null,
+  selectedBlog: null,
+  hasChanges: false,
+  originalContent: null
+};
+
+export interface AISummary {
+  blog_id: string;
+  summary: string;
+  created_at: string;
 }

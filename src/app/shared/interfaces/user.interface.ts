@@ -3,7 +3,6 @@ export interface User {
   id?: string;  // Legacy id for compatibility
   username: string;
   email: string;
-  email_verified?: boolean; // Email verification status
   full_name?: string;
   bio?: string;
   profile_picture?: string;
@@ -15,6 +14,13 @@ export interface User {
   has_password?: boolean; // Indicates if user can change password
   created_at: string;
   updated_at?: string;
+}
+
+export interface CreateUserResponse {
+  _id:string;
+  username: string;
+  email: string;
+  created_at:string;
 }
 
 

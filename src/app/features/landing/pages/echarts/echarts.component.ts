@@ -7,7 +7,7 @@ import { mostLiked, postsByCategory, postsOverTime, topTags, Total, usersOverTim
   selector: 'app-echarts',
   imports: [],
   templateUrl: './echarts.component.html',
-  styleUrls: ['./echarts.component.css']
+  styleUrl: './echarts.component.css'
 })
 export class EchartsComponent implements OnInit {
   selectedPostsRange = 'all';

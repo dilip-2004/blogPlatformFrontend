@@ -4,7 +4,7 @@ body.has-header {
 }
 
 .main-content {
-  padding-top: 20px;
+  padding: 1rem;
 }
 
 /* Ensure router outlet content has proper spacing when header is shown */

@@ -1,8 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject, takeUntil } from 'rxjs';
-import { WebSocketService } from '../../services/web-socket.service';
+import { Subject } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
 import { DashboardService } from '../../../../core/services/dashboard.service';
 import { mostLiked, postsByCategory, postsOverTime, topTags, Total, usersOverTime } from '../../../../shared/interfaces/dashboard.interface';
@@ -40,32 +39,11 @@ export class ChartjsComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
   constructor(
-    private dashboardService: DashboardService,
-    private webSocketService: WebSocketService
+    private dashboardService: DashboardService
   ) {}
 
   ngOnInit(): void {
     this.loadAllCharts(this.selectedRange);
-
-    // Connect to the WebSocket server (use your actual URL here)
-    this.webSocketService.connect('ws://localhost:8080');
-
-    // Subscribe to real-time updates
-    this.webSocketService.messages$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((data: any) => {
-        // Example: update posts chart if relevant data arrives
-        if (data.postsOverTime) {
-          this.renderPostChart('postsChart', data.postsOverTime, 'Posts Over Time (Live)');
-        }
-        if (data.usersOverTime) {
-          this.renderUserChart('usersChart', data.usersOverTime, 'Users Over Time (Live)');
-        }
-        if (data.totals) {
-          this.totals = data.totals;
-        }
-        // Add similar logic for other chart types as needed
-      });
   }
 
   ngAfterViewInit(): void {}
@@ -99,8 +77,6 @@ export class ChartjsComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    // Optionally close WebSocket connection if this is the only consumer
-    // this.webSocketService.ngOnDestroy();
     this.destroyCharts();
   }
 

@@ -5,6 +5,16 @@
   color: #ffffff;
   font-family: 'Inter', sans-serif;
   padding-bottom: 60px;
+
+}
+/* Adjust image URL input for mobile */
+@media (max-width: 767px) {
+  .image-url-input {
+    width: 100%;
+    font-size: 14px;
+    padding: 0.5rem;
+    box-sizing: border-box;
+  }
 }
 
 /* Header */
@@ -272,39 +282,23 @@
   right: 1rem;
   opacity: 0;
   transition: opacity 0.3s ease;
-  z-index: 50; /* Highest z-index to always stay above everything */
-  pointer-events: auto;
+  z-index: 10; /* Ensure controls stay above all other elements */
 }
 
 .content-block:hover .block-controls {
   opacity: 1;
-  z-index: 50 !important; /* Ensure controls are always visible */
-}
-
-/* Additional specificity for block controls visibility */
-.block-controls:hover {
-  opacity: 1 !important;
-  z-index: 50 !important;
+  z-index: 15; /* Ensure highest priority on hover */
 }
 
 .control-group {
   display: flex;
   gap: 0.25rem;
-  background: rgba(10, 10, 10, 0.8);
+  background: rgba(10, 10, 10, 0.95);
   border: 1px solid rgba(102, 126, 234, 0.2);
   border-radius: 8px;
   padding: 0.25rem;
-  backdrop-filter: blur(10px);
-  position: relative;
-  z-index: 100; /* Highest z-index for control buttons */
-  pointer-events: auto;
-}
-
-/* Ensure control group always stays on top */
-.control-group:hover,
-.control-group:focus,
-.control-group:focus-within {
-  z-index: 100 !important;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .control-btn {
@@ -319,6 +313,8 @@
   cursor: pointer;
   transition: all 0.2s ease;
   color: #9ca3af;
+  position: relative;
+  z-index: 20; /* Ensure buttons stay clickable */
 }
 
 .control-btn:hover:not(:disabled) {
@@ -380,28 +376,30 @@
   gap: 1rem;
 }
 
-.image-input-container {
+.image-upload-options {
   display: flex;
-  gap: 0.75rem;
   align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .image-url-input {
   flex: 1;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #e5e7eb;
   border: 1px solid rgba(102, 126, 234, 0.2);
-  background: rgba(10, 10, 10, 0.5);
-  border-radius: 8px;
-  padding: 0.75rem;
-  font-size: 0.9rem;
-  color: #ffffff;
+  border-radius: 12px;
+  background: rgba(31, 41, 55, 0.6);
   outline: none;
   transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
 .image-url-input:focus {
   border-color: rgba(102, 126, 234, 0.5);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  background: rgba(10, 10, 10, 0.8);
+  background: rgba(31, 41, 55, 0.8);
 }
 
 .image-url-input::placeholder {
@@ -409,43 +407,70 @@
 }
 
 .upload-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 0.75rem 1rem;
-  background: rgba(102, 126, 234, 0.1);
-  border: 1px solid rgba(102, 126, 234, 0.3);
-  border-radius: 8px;
-  color: #c4b5fd;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  white-space: nowrap;
-  font-size: 0.9rem;
-  font-weight: 500;
-  backdrop-filter: blur(10px);
 }
 
 .upload-btn:hover:not(:disabled) {
-  background: rgba(102, 126, 234, 0.2);
-  border-color: rgba(102, 126, 234, 0.5);
-  color: #ffffff;
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
 .upload-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
+  transform: none !important;
 }
 
-.upload-btn:focus {
-  outline: none;
-  border-color: rgba(102, 126, 234, 0.5);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+.upload-divider {
+  color: #6c757d;
+  font-size: 14px;
+}
+
+/* Upload Loading */
+.upload-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.upload-loading .loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e9ecef;
+  border-top: 2px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .image-preview {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-right: 130px; /* Reserve space for block controls */
+  position: relative;
+  z-index: 1; /* Lower z-index than controls */
 }
 
 .image-preview img {
@@ -457,15 +482,13 @@
 }
 
 .image-url-display {
-  font-size: 0.8rem;
-  color: #9ca3af;
-  word-break: break-all;
   margin-top: 8px;
-  margin-right: 130px; /* Increased margin to prevent overlap with block controls */
+  margin-right: 140px; /* Increased margin to prevent overlap with block controls */
   padding: 8px 12px;
   background: rgba(31, 41, 55, 0.6);
   border: 1px solid rgba(102, 126, 234, 0.2);
   border-radius: 8px;
+  word-break: break-all;
   backdrop-filter: blur(10px);
   position: relative;
   z-index: 1; /* Lowest z-index to stay below block controls */
@@ -480,19 +503,18 @@
   z-index: 1 !important; /* Force low z-index even on focus */
 }
 
+.image-url-display small {
+  color: #9ca3af;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 /* Add Block Controls */
 .add-block-container {
   display: flex;
   justify-content: center;
   margin: 1rem 0;
   position: relative;
-  transition: all 0.3s ease; /* Smooth transition for spacing changes */
-}
-
-/* Add extra space when menu is open - using CSS class that will be toggled via Angular */
-.add-block-container.menu-open {
-  margin-bottom: 150px; /* Increased space when menu is open to prevent overlap */
-  padding-bottom: 20px; /* Additional padding for menu space */
 }
 
 .add-block-btn {
@@ -509,8 +531,6 @@
   color: #9ca3af;
   opacity: 0.6;
   backdrop-filter: blur(10px);
-  position: relative;
-  z-index: 1001; /* Ensure plus buttons are always clickable */
 }
 
 .add-block-btn:hover {
@@ -528,7 +548,6 @@
   border-color: #667eea;
   color: #667eea;
   background: rgba(102, 126, 234, 0.1);
-  z-index: 1001; /* Slightly higher than menu to stay clickable */
 }
 
 /* Add Menu */
@@ -545,10 +564,9 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  z-index: 1000; /* Much higher z-index to ensure it's always on top */
+  z-index: 10;
   min-width: 150px;
   backdrop-filter: blur(20px);
-  pointer-events: auto; /* Ensure menu can receive interactions */
 }
 
 .menu-item {
@@ -630,7 +648,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1009;
+  z-index: 1000;
   padding: 1rem;
 }
 
@@ -922,7 +940,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1011;
+  z-index: 1000;
   padding: 1.5rem;
 }
 

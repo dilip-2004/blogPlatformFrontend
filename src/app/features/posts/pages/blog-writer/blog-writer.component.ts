@@ -9,7 +9,6 @@ import { ImageUploadService } from '../../../../core/services/image-upload.servi
 import { FooterComponent } from "../../../../shared/components/footer/footer.component";
 import { Tag } from '../../../../shared/interfaces/post.interface';
 import { DateUtil } from '../../../../shared/utils/date.util';
-import { normalizeTag, normalizeTags, areTagsEqual } from '../../../../shared/utils/tag.util';
 
 export interface BlogBlock {
   id: string;
@@ -38,7 +37,6 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   isSaving = false;
   isUploadingImage = false;
-  private hoverTimeout: any = null;
   
   // Publish modal state
   showPublishModal = false;
@@ -97,28 +95,14 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
 
   // Toggle add menu
   toggleAddMenu(blockId?: string): void {
-    // Clear any pending close timeout
-    if (this.hoverTimeout) {
-      clearTimeout(this.hoverTimeout);
-      this.hoverTimeout = null;
-    }
-    
     this.currentBlockId = blockId || null;
-    this.showAddMenu = true; // Always show on hover/click
+    this.showAddMenu = !this.showAddMenu;
   }
 
-  // Close add menu with delay to prevent accidental closing
+  // Close add menu
   closeAddMenu(): void {
-    // Clear any existing timeout
-    if (this.hoverTimeout) {
-      clearTimeout(this.hoverTimeout);
-    }
-    
-    // Add a small delay before closing to prevent accidental closing
-    this.hoverTimeout = setTimeout(() => {
-      this.showAddMenu = false;
-      this.currentBlockId = null;
-    }, 200); // 200ms delay
+    this.showAddMenu = false;
+    this.currentBlockId = null;
   }
 
   // Add new block
@@ -215,54 +199,6 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
     alert('Preview feature will be implemented. Check console for blog data.');
   }
 
-  // Save blog as draft
-  saveBlog(): void {
-    if (!this.blogTitle.trim()) {
-      alert('Please enter a blog title');
-      return;
-    }
-
-    if (this.blogBlocks.length === 0) {
-      alert('Please add some content blocks');
-      return;
-    }
-
-    this.isSaving = true;
-
-    // Convert blocks to JSON string for storage
-    const contentJsonString = JSON.stringify(this.blogBlocks);
-
-    // Create blog data with proper structure
-    const blogData = {
-      _id: this.generateBlogId(),
-      user_id: this.getCurrentUserId(),
-      title: this.blogTitle,
-      content: contentJsonString, // JSON stringified blocks
-      tag_ids: [],
-      main_image_url: '',
-      published: false, // Save as draft
-      created_at: DateUtil.getCurrentTimestamp(),
-      updated_at: DateUtil.getCurrentTimestamp()
-    };
-
-    console.log('Saving blog draft to localStorage:', blogData);
-    console.log('Content (JSON string):', contentJsonString);
-
-    try {
-      // Save to localStorage
-      this.saveBlogToLocalStorage(blogData);
-      
-      setTimeout(() => {
-        this.isSaving = false;
-        alert('Blog draft saved successfully!');
-      }, 1000);
-    } catch (error) {
-      console.error('Error saving blog:', error);
-      this.isSaving = false;
-      alert('Error saving blog. Please try again.');
-    }
-  }
-
   // Open publish modal
   openPublishModal(): void {
     if (!this.blogTitle.trim()) {
@@ -315,7 +251,7 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
         console.log('Full upload response:', response);
         if (response && response.imageUrl) {
           block.data = response.imageUrl;
-          console.log('Image uploaded successfully:', response.imageUrl);
+          console.log('Image uploaded to S3 successfully:', response.imageUrl);
           this.showMessageContainer('Image uploaded successfully!', 'success');
           this.isUploadingImage = false;
         } else {
@@ -338,46 +274,6 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
     input.accept = 'image/*';
     input.onchange = (event) => this.onImageFileSelect(event!, blockId);
     input.click();
-  }
-
-  // Generate unique blog ID (MongoDB ObjectId-like format)
-  private generateBlogId(): string {
-    // Generate a pseudo-ObjectId for localStorage blogs
-    const timestamp = Math.floor(Date.now() / 1000).toString(16);
-    const random = Math.random().toString(16).substring(2, 16);
-    return timestamp + random.padEnd(16, '0');
-  }
-
-
-  // Get current user ID (you might need to implement this based on your auth service)
-  private getCurrentUserId(): string {
-    // For now, return a placeholder. You should get this from your auth service
-    return 'user_' + Date.now().toString();
-  }
-
-  // Save blog data to localStorage
-  private saveBlogToLocalStorage(blogData: any): void {
-    // Get existing blogs from localStorage
-    const existingBlogs = this.getBlogsFromLocalStorage();
-    
-    // Add new blog to the list
-    existingBlogs.push(blogData);
-    
-    // Save back to localStorage
-    localStorage.setItem('user_blogs', JSON.stringify(existingBlogs));
-    
-    console.log('Blog saved to localStorage. Total blogs:', existingBlogs.length);
-  }
-
-  // Get blogs from localStorage
-  private getBlogsFromLocalStorage(): any[] {
-    try {
-      const blogsJson = localStorage.getItem('user_blogs');
-      return blogsJson ? JSON.parse(blogsJson) : [];
-    } catch (error) {
-      console.error('Error reading blogs from localStorage:', error);
-      return [];
-    }
   }
 
   // Discard changes and go back
@@ -455,7 +351,7 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (response) => {
         this.mainImageUrl = response.imageUrl;
-        console.log('Main image uploaded successfully:', response.imageUrl);
+        console.log('Main image uploaded to S3:', response.imageUrl);
         this.showMessageContainer('Main image uploaded successfully!', 'success');
         this.isUploadingMainImage = false;
       },
@@ -490,8 +386,7 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
       return;
     }
     
-    const norm = normalizeTag(tagName);
-    if (this.selectedTags.some(t => areTagsEqual(t, norm))) {
+    if (this.selectedTags.includes(tagName)) {
       alert('Tag already added');
       return;
     }
@@ -501,7 +396,7 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
       return;
     }
     
-    this.selectedTags.push(norm);
+    this.selectedTags.push(tagName);
     this.newTagInput = '';
   }
 
@@ -515,13 +410,12 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
 
   // Add tag from recommended list
   addRecommendedTag(tagName: string): void {
-    const norm = normalizeTag(tagName);
-    if (!this.selectedTags.some(t => areTagsEqual(t, norm))) {
+    if (!this.selectedTags.includes(tagName)) {
       if (this.selectedTags.length >= 10) {
         alert('Maximum 10 tags allowed');
         return;
       }
-      this.selectedTags.push(norm);
+      this.selectedTags.push(tagName);
     }
   }
 
@@ -544,7 +438,7 @@ export class BlogWriterComponent implements OnInit, OnDestroy {
     const blogData = {
       title: this.blogTitle,
       content: contentJsonString,
-      tags: normalizeTags(this.selectedTags),
+      tags: this.selectedTags,
       main_image_url: this.mainImageUrl || '',
       published: true
     };

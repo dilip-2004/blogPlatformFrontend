@@ -5,27 +5,14 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { BlogService } from '../../../../core/services/blog.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { ProfilePictureService } from '../../../../core/services/profile-picture.service';
-import { Blog, BlogSummary, AiSummary } from '../../../../shared/interfaces/post.interface';
+import { AiSummary, Blog, BlogComment } from '../../../../shared/interfaces/post.interface';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
 import { AiSummaryService } from '../../../../core/services/ai-summary.service';
 import { CommentService } from '../../../../core/services/comment.service';
 import { LikeService } from '../../../../core/services/like.service';
-import { CommentResponse } from '../../../../shared/interfaces/comment.interface';
-
-// Local interfaces for component use
-interface CommentCreate {
-  text: string;
-}
-
-interface LikeResponse {
-  _id?: string;
-  user_id?: string;
-  blog_id?: string;
-  created_at?: string;
-  message?: string;
-}
+import { CommentCreate, LikeResponse } from '../../../../shared/interfaces';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-blog-detail',
@@ -43,7 +30,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   blogId: string = '';
 
   // AI Summary properties
-  aiSummary: any | null = null;
+  aiSummary: AiSummary | undefined = undefined;
   summaryLoading = false;
   summaryError: string | null = null;
   showSummarySidebar = false;
@@ -57,10 +44,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   showComments = false;
   editingCommentId: string | null = null;
   editingCommentText = '';
-  updatingComment = false;
-  deletingCommentId: string | null = null;
-  showDeleteCommentModal = false;
-  selectedCommentForDelete: string | null = null;
 
   // Like properties
   isLiked = false;
@@ -73,7 +56,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     private router: Router,
     private blogService: BlogService,
     private authService: AuthService,
-    private profilePictureService: ProfilePictureService,
     private aiSummaryService: AiSummaryService,
     private commentService: CommentService,
     private likeService: LikeService
@@ -86,17 +68,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     } else {
       this.error = 'Blog ID not found';
     }
-    
-    // Subscribe to current user changes to trigger profile picture updates
-    this.authService.currentUser$.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(user => {
-      // Force change detection when user data changes to update profile pictures
-      if (this.blog && user) {
-        // The template will automatically re-evaluate getAuthorProfilePictureUrl()
-        // when the currentUser$ observable emits new data
-      }
-    });
   }
 
   ngOnDestroy(): void {
@@ -135,8 +106,8 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  getDisplayName(name?: string): string {
-    return name || '';
+  getFirstName(fullName?: string): string {
+    return fullName?.split('@')[0] || '';
   }
 
   loadBlog(): void {
@@ -152,10 +123,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
         // Initialize counts from blog data
         this.likesCount = blog.likes_count || 0;
         this.commentCount = blog.comment_count || 0;
-        // Try to load existing AI summary if blog is published
-        if (blog.published) {
-          this.loadAiSummary();
-        }
         // Load like status for authenticated users
         this.loadLikeStatus();
         // Load blog likes count from API to ensure accuracy
@@ -173,14 +140,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
 
   navigateBack(): void {
     this.router.navigate(['/home']);
-  }
-
-
-
-
-
-  getPlaceholderImage(): string {
-    return 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
   }
 
   getContentBlocks(): any[] {
@@ -238,33 +197,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=667eea&color=fff&size=40`;
   }
 
-  // AI Summary methods
-  loadAiSummary(): void {
-    if (!this.blogId) return;
-    
-    this.summaryLoading = true;
-    this.summaryError = null;
-    
-    this.aiSummaryService.getAiSummary(this.blogId).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (summary: any) => {
-        this.aiSummary = summary;
-        this.summaryLoading = false;
-      },
-      error: (error: any) => {
-        // If summary doesn't exist (404), that's normal
-        if (error.status === 404) {
-          this.aiSummary = null;
-        } else {
-          console.error('Error loading AI summary:', error);
-          this.summaryError = 'Failed to load AI summary';
-        }
-        this.summaryLoading = false;
-      }
-    });
-  }
-
   generateAiSummary(): void {
     if (!this.blogId || !this.blog?.published || !this.blog?.title || !this.blog?.content) return;
     
@@ -278,11 +210,11 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     ).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
-      next: (summary: any) => {
+      next: (summary: AiSummary) => {
         this.aiSummary = summary;
         this.summaryLoading = false;
       },
-      error: (error: any) => {
+      error: (error: HttpErrorResponse) => {
         console.error('Error generating AI summary:', error);
         this.summaryError = error.error?.detail || 'Failed to generate AI summary';
         this.summaryLoading = false;
@@ -290,38 +222,9 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteAiSummary(): void {
-    if (!this.blogId || !this.aiSummary) return;
-    
-    if (confirm('Are you sure you want to delete this AI summary?')) {
-      this.summaryLoading = true;
-      this.summaryError = null;
-      
-      this.aiSummaryService.deleteAiSummary(this.blogId).pipe(
-        takeUntil(this.destroy$)
-      ).subscribe({
-        next: () => {
-          this.aiSummary = null;
-          this.summaryLoading = false;
-        },
-        error: (error: any) => {
-          console.error('Error deleting AI summary:', error);
-          this.summaryError = 'Failed to delete AI summary';
-          this.summaryLoading = false;
-        }
-      });
-    }
-  }
-
   canManageSummary(): boolean {
     // All authenticated users can generate summaries
     return this.authService.isAuthenticated();
-  }
-
-  canDeleteSummary(): boolean {
-    // Only the blog author can delete summaries
-    return this.authService.isAuthenticated() && 
-           this.blog?.user_id === this.authService.getCurrentUser()?._id;
   }
 
   // Helper method to get tag name (handles both string and object types)
@@ -352,7 +255,27 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: (comments: any[]) => {
-        this.comments = comments;
+        console.log('Loaded comments:', comments);
+        this.comments = comments as BlogComment[];
+        
+        // Debug current user for permission checking
+        const currentUser = this.authService.getCurrentUser();
+        console.log('Current user for comment permissions:', currentUser);
+        console.log('Is authenticated:', this.authService.isAuthenticated());
+        
+        // Debug each comment for permission checking
+        comments.forEach((comment, index) => {
+          const canEdit = this.canEditComment(comment);
+          console.log(`Comment ${index} debug:`, {
+            comment_id: comment._id,
+            comment_user_id: comment.user_id,
+            comment_user_name: comment.user_name,
+            current_user: currentUser,
+            current_user_id: currentUser?._id || currentUser?.id,
+            can_edit: canEdit
+          });
+        });
+        
         // Update comment count based on actual loaded comments
         this.commentCount = comments.length;
         console.log('Updated comment count:', this.commentCount);
@@ -361,7 +284,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
         }
         this.commentsLoading = false;
       },
-      error: (error: any) => {
+      error: (error: HttpErrorResponse) => {
         console.error('Error loading comments:', error);
         this.commentsError = 'Failed to load comments';
         this.commentsLoading = false;
@@ -391,7 +314,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
           this.blog.comment_count = this.commentCount;
         }
       },
-      error: (error: any) => {
+      error: (error: HttpErrorResponse) => {
         console.error('Error adding comment:', error);
         this.addingComment = false;
       }
@@ -399,19 +322,6 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   }
 
   startEditComment(comment: any): void {
-    // Validate authentication before allowing edit
-    if (!this.authService.isAuthenticated()) {
-      alert('You must be logged in to edit comments.');
-      return;
-    }
-    
-    // Validate permission
-    if (!this.canEditComment(comment)) {
-      alert('You do not have permission to edit this comment.');
-      return;
-    }
-    
-    console.log('Starting edit for comment:', comment._id);
     this.editingCommentId = comment._id;
     this.editingCommentText = comment.text;
   }
@@ -422,16 +332,8 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
   }
 
   updateComment(): void {
-    if (!this.editingCommentId || !this.editingCommentText.trim() || this.updatingComment) return;
+    if (!this.editingCommentId || !this.editingCommentText.trim()) return;
     
-    // Validate authentication before proceeding
-    if (!this.authService.isAuthenticated()) {
-      alert('You must be logged in to edit comments.');
-      this.cancelEditComment();
-      return;
-    }
-    
-    this.updatingComment = true;
     const commentData: CommentCreate = {
       text: this.editingCommentText.trim()
     };
@@ -442,117 +344,67 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
       next: (updatedComment: any) => {
         const index = this.comments.findIndex(c => c._id === this.editingCommentId);
         if (index !== -1) {
-          // Preserve user information from the original comment if not returned
-          this.comments[index] = {
-            ...this.comments[index],
-            ...updatedComment,
-            updated_at: updatedComment.updated_at || new Date().toISOString()
-          };
+          this.comments[index] = updatedComment;
         }
-        this.updatingComment = false;
         this.cancelEditComment();
       },
-      error: (error: any) => {
+      error: (error: HttpErrorResponse) => {
         console.error('Error updating comment:', error);
-        this.updatingComment = false;
-        
-        // Show user-friendly error message
-        let errorMessage = 'Failed to update comment. ';
-        if (error.status === 401) {
-          errorMessage += 'Please log in and try again.';
-          this.cancelEditComment();
-        } else if (error.status === 403) {
-          errorMessage += 'You do not have permission to edit this comment.';
-          this.cancelEditComment();
-        } else if (error.status === 404) {
-          errorMessage += 'Comment not found.';
-          this.loadComments(); // Refresh comments to sync state
-        } else {
-          errorMessage += 'Please try again.';
-        }
-        
-        alert(errorMessage);
       }
     });
   }
 
   deleteComment(commentId: string): void {
-    this.selectedCommentForDelete = commentId;
-    this.showDeleteCommentModal = true;
-  }
-
-  confirmDeleteComment(): void {
-    if (!this.selectedCommentForDelete) return;
+    if (!confirm('Are you sure you want to delete this comment?')) return;
     
-    // Validate authentication before proceeding
-    if (!this.authService.isAuthenticated()) {
-      alert('You must be logged in to delete comments.');
-      this.showDeleteCommentModal = false;
-      this.selectedCommentForDelete = null;
-      return;
-    }
-    
-    // Prevent multiple simultaneous delete operations
-    if (this.deletingCommentId === this.selectedCommentForDelete) return;
-
-    this.deletingCommentId = this.selectedCommentForDelete;
-    const commentIdToDelete = this.selectedCommentForDelete;
-
-    this.showDeleteCommentModal = false;
-    this.selectedCommentForDelete = null;
-    
-    this.commentService.deleteComment(this.deletingCommentId).pipe(
+    this.commentService.deleteComment(commentId).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: () => {
-        this.comments = this.comments.filter(c => c._id !== commentIdToDelete);
+        this.comments = this.comments.filter(c => c._id !== commentId);
         // Update blog comment count
         this.commentCount = Math.max(this.commentCount - 1, 0);
         if (this.blog) {
           this.blog.comment_count = this.commentCount;
         }
-        this.deletingCommentId = null;
-        
-        // Cancel edit mode if deleting the comment being edited
-        if (this.editingCommentId === commentIdToDelete) {
-          this.cancelEditComment();
-        }
       },
-      error: (error: any) => {
+      error: (error: HttpErrorResponse) => {
         console.error('Error deleting comment:', error);
-        this.deletingCommentId = null;
-        
-        // Show user-friendly error message
-        let errorMessage = 'Failed to delete comment. ';
-        if (error.status === 401) {
-          errorMessage += 'Please log in and try again.';
-        } else if (error.status === 403) {
-          errorMessage += 'You do not have permission to delete this comment.';
-        } else if (error.status === 404) {
-          errorMessage += 'Comment not found. It may have already been deleted.';
-          this.loadComments(); // Refresh comments to sync state
-        } else {
-          errorMessage += 'Please try again.';
-        }
-        
-        alert(errorMessage);
       }
     });
   }
 
   canEditComment(comment: any): boolean {
-    const currentUser = this.authService.getCurrentUser();
-    const isAuthenticated = this.authService.isAuthenticated();
-    
-    if (!isAuthenticated || !currentUser || !comment) {
+    if (!this.authService.isAuthenticated()) {
+      console.log('User not authenticated');
       return false;
     }
     
-    // Handle both _id and id formats for user identification
-    const currentUserId = currentUser._id || currentUser.id;
-    const commentUserId = comment.user_id;
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      console.log('No current user found');
+      return false;
+    }
     
-    return currentUserId === commentUserId;
+    // Support both _id and id properties for user identification
+    const currentUserId = currentUser._id || currentUser.id;
+    const commentUserId = comment.user_id || comment.userId;
+    
+    // Ensure both IDs are strings for comparison
+    const currentUserIdStr = String(currentUserId);
+    const commentUserIdStr = String(commentUserId);
+    
+    const canEdit = currentUserIdStr === commentUserIdStr;
+    
+    console.log('Checking comment edit permission:', {
+      currentUserId: currentUserIdStr,
+      commentUserId: commentUserIdStr,
+      currentUserUsername: currentUser.username,
+      commentUserName: comment.user_name || comment.username,
+      canEdit
+    });
+    
+    return canEdit;
   }
 
   // Like methods
@@ -565,7 +417,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
       next: (like: LikeResponse) => {
         this.isLiked = !!like._id;
       },
-      error: (error: any) => {
+      error: (error: HttpErrorResponse) => {
         // 404 means user hasn't liked this blog
         if (error.status === 404) {
           this.isLiked = false;
@@ -587,7 +439,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
           this.blog.likes_count = count;
         }
       },
-      error: (error: any) => {
+      error: (error: HttpErrorResponse) => {
         console.error('Error loading likes count:', error);
       }
     });
@@ -623,7 +475,7 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
         // Reload likes count to ensure accuracy
         this.loadBlogLikesCount();
       },
-      error: (error: any) => {
+      error: (error: HttpErrorResponse) => {
         console.error('Error toggling like:', error);
         this.likesLoading = false;
       }
@@ -643,59 +495,8 @@ export class BlogDetailComponent implements OnInit, OnDestroy {
     this.showSummarySidebar = !this.showSummarySidebar;
     
     // If opening sidebar and no summary exists, generate one
-    if (this.showSummarySidebar && !this.aiSummary && !this.summaryLoading && this.canManageSummary()) {
+    if (this.showSummarySidebar && !this.summaryLoading && this.canManageSummary()) {
       this.generateAiSummary();
     }
-  }
-
-  // Get author profile picture URL
-  getAuthorProfilePictureUrl(): string | null {
-    // If the blog author is the current user, use current user's profile picture
-    const currentUser = this.authService.getCurrentUser();
-    
-    if (currentUser && this.blog) {
-      // Handle both 'id' and '_id' properties for user identification
-      const currentUserId = currentUser._id || currentUser.id;
-      
-      if (currentUserId === this.blog.user_id) {
-        // Use live current user data for own blogs
-        return this.profilePictureService.getUserProfilePictureUrl(currentUser);
-      }
-    }
-    
-    // For other users' blogs, try to use populated user data if available
-    if (this.blog) {
-      // Check if blog has populated user field with profile_picture
-      if (this.blog.user && this.blog.user.profile_picture) {
-        return this.profilePictureService.getUserProfilePictureUrl(this.blog.user);
-      }
-      
-      // Fallback: create a minimal user object for ProfilePictureService
-      // Note: this will likely return null since we don't have the profile_picture
-      const blogAuthor = {
-        _id: this.blog.user_id,
-        username: this.blog.username,
-        profile_picture: null // Blog interface doesn't include profile_picture
-      };
-      return this.profilePictureService.getUserProfilePictureUrl(blogAuthor);
-    }
-    
-    return null;
-  }
-
-  // Handle author image error
-  onAuthorImageError(event: Event): void {
-    this.profilePictureService.onImageError(event);
-  }
-
-  // Debug method for troubleshooting comment issues
-  debugCommentPermissions(comment: any): void {
-    console.log('=== Comment Debug Info ===');
-    console.log('Current User:', this.authService.getCurrentUser());
-    console.log('Is Authenticated:', this.authService.isAuthenticated());
-    console.log('Comment:', comment);
-    console.log('Can Edit Comment:', this.canEditComment(comment));
-    console.log('Auth Token Info:', this.authService.getTokenInfo?.());
-    console.log('========================');
   }
 }

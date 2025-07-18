@@ -12,11 +12,6 @@ export class AiSummaryService {
 
   constructor(private http: HttpClient) {}
 
-  // Get AI summary for a blog
-  getAiSummary(blogId: string): Observable<AiSummary> {
-    return this.http.get<AiSummary>(`${this.apiUrl}/summaries/${blogId}`);
-  }
-
   // Generate AI summary for a blog
   generateAiSummary(blogId: string, blogTitle: string, blogContent: string): Observable<AiSummary> {
     const payload: AiSummaryCreate = {
@@ -25,11 +20,6 @@ export class AiSummaryService {
       blog_content: blogContent
     };
     return this.http.post<AiSummary>(`${this.apiUrl}/summaries/`, payload);
-  }
-
-  // Delete AI summary for a blog
-  deleteAiSummary(blogId: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/summaries/${blogId}`);
   }
 }
 

@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { BlogStateService } from '../../../../core/services/blog-state.service';
-import { AuthService } from '../../../../core/services/auth.service';
-import { ProfilePictureService } from '../../../../core/services/profile-picture.service';
 import { Blog } from '../../../../shared/interfaces/post.interface';
 import { FooterComponent } from "../../../../shared/components/footer/footer.component";
 import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
@@ -27,8 +25,6 @@ export class MyBlogsComponent implements OnInit, OnDestroy {
 
   constructor(
     private blogStateService: BlogStateService,
-    private authService: AuthService,
-    private profilePictureService: ProfilePictureService,
     private router: Router
   ) {}
 
@@ -207,18 +203,6 @@ export class MyBlogsComponent implements OnInit, OnDestroy {
     if (target) {
       target.src = this.getPlaceholderImage();
     }
-  }
-
-  // Navigate to blog detail page
-  navigateToBlogDetail(blog: Blog): void {
-    // Handle both API response format (id) and localStorage format (_id)
-    const blogId = (blog as any).id || blog._id;
-    if (!blogId || blogId === '' || blogId === 'undefined') {
-      console.error('Blog ID is missing or invalid:', blog);
-      return;
-    }
-    console.log('Navigating to blog detail with ID:', blogId);
-    this.router.navigate(['/posts/detail', blogId]);
   }
 }
 

@@ -1,5 +1,3 @@
-import { User } from './user.interface';
-
 // Comment interfaces matching backend format
 export interface Comment {
   _id: string;
@@ -40,5 +38,9 @@ export interface CommentsResponse {
   page: number;
   limit: number;
   total_pages: number;
+}
+
+export interface CommentCreate {
+  text: string;
 }
 
