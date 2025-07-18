@@ -9,7 +9,8 @@ import { BlogSummary } from '../../../../shared/interfaces/post.interface';
 import { FooterComponent } from '../../../../shared/components/footer/footer.component';
 import { InterestsComponent } from '../../../../shared/components/interests/interests.component';
 import { InterestsService } from '../../../../core/services/interests.service';
-import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
+import { PaginationComponent } from "../../../../shared/components/pagination/pagination.component";
+import { BlogListComponent } from '../../../../shared/components/blog-list/blog-list.component';
 
 @Component({
   selector: 'app-home',
@@ -20,8 +21,9 @@ imports: [
     FormsModule,
     FooterComponent,
     InterestsComponent,
-    DateFormatPipe
-  ],
+    PaginationComponent,
+    BlogListComponent
+],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -119,8 +121,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (response) => {
         this.posts = response.posts;
-        console.log(this.posts);
-        console.log('Loaded posts:', this.posts);
         this.currentPage = response.page;
         this.totalPages = response.total_pages;
         this.loading = false;
@@ -257,36 +257,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     return canvas.toDataURL();
   }
   
-  getImageUrl(imageUrl: string | undefined): string | null {
-    // Return null if the image URL is not available
-    if (!imageUrl || imageUrl.trim() === '') {
-      return null;
-    }
-    
-    // If it's already a full URL (starts with http/https), return as is
-    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-      return imageUrl;
-    }
-    
-    // If it's an AWS S3 key/path, ensure it's a complete URL
-    if (imageUrl.startsWith('uploads/')) {
-      // Construct the full S3 URL if only the path is provided
-      return `https://blog-app-2025.s3.amazonaws.com/${imageUrl}`;
-    }
-    
-    // If it contains amazonaws.com, it's already a complete S3 URL
-    if (imageUrl.includes('amazonaws.com')) {
-      return imageUrl;
-    }
-    
-    // If it's a data URL (base64), return as is
-    if (imageUrl.startsWith('data:')) {
-      return imageUrl;
-    }
-    
-    // Default fallback for other cases
-    return null;
-  }
   
   toggleUserMenu(event: Event): void {
     event.stopPropagation();
@@ -315,23 +285,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Navigate to blog detail page
-  navigateToBlogDetail(postId: string): void {
-    this.router.navigate(['/posts/detail', postId]);
-  }
-
-  // Helper method to extract tag names from tags array
-  getTagNames(tags: any[]): string[] {
-    if (!tags) return [];
-    return tags.map(tag => {
-      if (typeof tag === 'string') {
-        return tag;
-      } else if (tag && tag.name) {
-        return tag.name;
-      }
-      return '';
-    }).filter(name => name);
-  }
 
   // interest page popup
   private checkUserInterests(): void {

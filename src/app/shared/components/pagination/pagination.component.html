@@ -1,0 +1,14 @@
+<!-- Top Pagination -->
+<div *ngIf="!loading && posts.length > 0 && totalPages > 1" class="pagination top-pagination">
+    <button class="pagination-btn" [disabled]="currentPage === 1" (click)="onPageChange(currentPage - 1)">
+        Previous
+    </button>
+
+    <span class="pagination-info">
+        Page {{ currentPage }} of {{ totalPages }}
+    </span>
+
+    <button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="onPageChange(currentPage + 1)">
+        Next
+    </button>
+</div>
