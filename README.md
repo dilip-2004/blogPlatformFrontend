@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # BlogPlatform Frontend 🌍
 
 > Modern Angular 19 application with real-time features, advanced state management, and progressive web app capabilities.
